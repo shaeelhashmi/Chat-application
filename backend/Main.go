@@ -1,6 +1,7 @@
 package main
 
 import (
+	"chat-app-backend/Auth"
 	"fmt"
 	"net/http"
 
@@ -22,6 +23,7 @@ func main() {
 		Message := r.Body
 		fmt.Fprintln(w, Message)
 	})
+	Auth.ConnectDB()
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)
 }
