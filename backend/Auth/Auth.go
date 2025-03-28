@@ -42,7 +42,12 @@ func ConnectDB() *sql.DB {
 	log.Println("Connected to database")
 	return Db
 }
-func Authenticate(w http.ResponseWriter, r *http.Request) {
+func Login(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	type User struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -56,5 +61,10 @@ func Authenticate(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &user)
 	defer r.Body.Close()
 	fmt.Println(user.Username, user.Password)
-
+	response := map[string]string{
+		"message": "Login successful",
+		"user":    user.Username,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
