@@ -2,7 +2,11 @@ package Auth
 
 import (
 	"database/sql"
+	"encoding/json"
+	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/go-sql-driver/mysql"
@@ -37,4 +41,20 @@ func ConnectDB() *sql.DB {
 	}
 	log.Println("Connected to database")
 	return Db
+}
+func Authenticate(w http.ResponseWriter, r *http.Request) {
+	type User struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	var user User
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+		return
+	}
+	json.Unmarshal(body, &user)
+	defer r.Body.Close()
+	fmt.Println(user.Username, user.Password)
+
 }

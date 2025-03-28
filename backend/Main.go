@@ -18,11 +18,7 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Hello, World!")
 	})
-	http.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		Message := r.Body
-		fmt.Fprintln(w, Message)
-	})
+	http.HandleFunc("/auth", Auth.Authenticate)
 	Auth.ConnectDB()
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)
