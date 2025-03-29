@@ -17,6 +17,7 @@ func main() {
 	})
 	DB := configurations.ConnectDB()
 	store := configurations.ConfigSessions()
+	go Auth.CheckSessions(DB)
 	http.HandleFunc("/auth/login", func(w http.ResponseWriter, r *http.Request) {
 		Auth.Login(w, r, store, DB)
 	})
@@ -24,7 +25,7 @@ func main() {
 		Auth.SignUp(w, r, DB)
 	})
 	http.HandleFunc("/isloggedin", func(w http.ResponseWriter, r *http.Request) {
-		Auth.IsloggedIn(w, r, store)
+		Auth.IsloggedIn(w, r, store, DB)
 	})
 	http.HandleFunc("/auth/logout", func(w http.ResponseWriter, r *http.Request) {
 		Auth.Logout(w, r, store)

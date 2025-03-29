@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/sessions"
 )
@@ -19,7 +20,13 @@ type User struct {
 }
 
 // Replace with your own secret key
-
+func GenerateSessionID(userName string) string {
+	current_time := time.Now().UnixMilli()
+	sessionID := fmt.Sprintf("%x", current_time)
+	sessionID = userName + sessionID
+	fmt.Println("Session ID:", sessionID)
+	return sessionID
+}
 func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, DB *sql.DB) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -34,7 +41,6 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, 
 	}
 	json.Unmarshal(body, &user)
 	defer r.Body.Close()
-	fmt.Println(user.Username, user.Password)
 
 	session, err := store.Get(r, "Login-session")
 	if err != nil {
@@ -58,11 +64,32 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, 
 		return
 	}
 	session.Values["username"] = user.Username
+	tx, err := DB.Begin()
+	if err != nil {
+		http.Error(w, "Failed to begin transaction", http.StatusInternalServerError)
+
+		return
+	}
+	defer tx.Rollback()
+	_, err = tx.Exec(`CREATE TABLE IF NOT EXISTS sessions (username VARCHAR(15) NOT NULL PRIMARY KEY, sessionID VARCHAR(255) NOT NULL,
+	 EndDate DATETIME DEFAULT (CURRENT_TIMESTAMP + INTERVAL 1 HOUR));`)
+	if err != nil {
+		http.Error(w, "Failed to create sessions table", http.StatusInternalServerError)
+		return
+	}
+	sessionID := GenerateSessionID(user.Username)
+	_, err = tx.Exec("INSERT INTO sessions (username, sessionID) VALUES (?, ?) ON DUPLICATE KEY UPDATE sessionID = VALUES(sessionID)", user.Username, sessionID)
+	if err != nil {
+		fmt.Print("Error inserting session:", err)
+		http.Error(w, "Failed to insert session", http.StatusInternalServerError)
+		return
+	}
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, "Failed to save session", http.StatusInternalServerError)
 		return
 	}
+	fmt.Println("Session ID:", session.ID)
 	type Response struct {
 		Message string `json:"message"`
 		User    string `json:"user"`
@@ -97,7 +124,7 @@ func SignUp(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 	}
 	defer tx.Rollback()
 	_, err = tx.Exec(`
-		CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS users (
 username VARCHAR(15) NOT NULL PRIMARY KEY,
 password VARCHAR(255) NOT NULL,
 salt BLOB NOT NULL
@@ -158,7 +185,7 @@ func generateRandomSalt(saltSize int) []byte {
 	}
 	return salt
 }
-func IsloggedIn(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) {
+func IsloggedIn(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, DB *sql.DB) {
 	session, err := store.Get(r, "Login-session")
 	if err != nil {
 		http.Error(w, "Failed to get session", http.StatusInternalServerError)
@@ -168,11 +195,21 @@ func IsloggedIn(w http.ResponseWriter, r *http.Request, store *sessions.CookieSt
 		http.Error(w, "Not logged in", http.StatusUnauthorized)
 		return
 	}
+	var sessionID string
+	err = DB.QueryRow("SELECT sessionID FROM sessions WHERE username=?", session.Values["username"]).Scan(&sessionID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Session not found", http.StatusUnauthorized)
+		} else {
+			http.Error(w, "Failed to query session", http.StatusInternalServerError)
+		}
+		return
+	}
 	response := map[string]string{
 		"message": "Logged in",
 		"user":    session.Values["username"].(string),
+		"session": sessionID,
 	}
-	fmt.Println("Logged in user:", session.Values["username"].(string))
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
@@ -188,6 +225,15 @@ func Logout(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore)
 		"message": "Logged out",
 	}
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Println("User Created")
 	json.NewEncoder(w).Encode(response)
+}
+
+func CheckSessions(db *sql.DB) {
+	for {
+		time.Sleep(15 * time.Minute)
+		_, err := db.Exec("DELETE FROM sessions WHERE EndDate < NOW()")
+		if err != nil {
+			fmt.Println("Error deleting expired sessions:", err)
+		}
+	}
 }
