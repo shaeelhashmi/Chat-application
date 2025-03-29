@@ -1,50 +1,17 @@
 package Auth
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
-	"os"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/sessions"
-	"github.com/joho/godotenv"
 )
 
-var store = sessions.NewCookieStore([]byte("secret-key")) // Replace with your own secret key
-var Db *sql.DB
+// Replace with your own secret key
 
-func ConnectDB() *sql.DB {
-	err1 := godotenv.Load()
-	if err1 != nil {
-		log.Fatal("Error loading .env file")
-	}
-	cfg := mysql.Config{
-		User:                 os.Getenv("DBUSER"),
-		Passwd:               os.Getenv("DBPASS"),
-		Net:                  "tcp",
-		Addr:                 "127.0.0.1:3306",
-		DBName:               "auth",
-		AllowNativePasswords: true,
-	}
-	// Get a database handle.
-	var err error
-	Db, err = sql.Open("mysql", cfg.FormatDSN())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	pingErr := Db.Ping()
-	if pingErr != nil {
-		log.Fatal(pingErr)
-	}
-	log.Println("Connected to database")
-	return Db
-}
-func Login(w http.ResponseWriter, r *http.Request) {
+func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -82,7 +49,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 	}
 }
-func IsloggedIn(w http.ResponseWriter, r *http.Request) {
+func IsloggedIn(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) {
 	session, err := store.Get(r, "Login-session")
 	if err != nil {
 		http.Error(w, "Failed to get session", http.StatusInternalServerError)
@@ -97,6 +64,20 @@ func IsloggedIn(w http.ResponseWriter, r *http.Request) {
 		"user":    session.Values["username"].(string),
 	}
 	fmt.Println("Logged in user:", session.Values["username"].(string))
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+func Logout(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) {
+	session, err := store.Get(r, "Login-session")
+	if err != nil {
+		http.Error(w, "Failed to get session", http.StatusInternalServerError)
+		return
+	}
+	session.Values["username"] = nil
+	session.Save(r, w)
+	response := map[string]string{
+		"message": "Logged out",
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"chat-app-backend/Auth"
+	configurations "chat-app-backend/Configurations"
 	"net/http"
 
 	"github.com/rs/cors"
@@ -14,10 +15,17 @@ func main() {
 		AllowedHeaders:   []string{"Content-Type"},
 		AllowCredentials: true,
 	})
-	Auth.ConnectDB()
-
-	http.HandleFunc("/auth/login", Auth.Login)
-	http.HandleFunc("/isloggedin", Auth.IsloggedIn)
+	configurations.ConnectDB()
+	store := configurations.ConfigSessions()
+	http.HandleFunc("/auth/login", func(w http.ResponseWriter, r *http.Request) {
+		Auth.Login(w, r, store)
+	})
+	http.HandleFunc("/isloggedin", func(w http.ResponseWriter, r *http.Request) {
+		Auth.IsloggedIn(w, r, store)
+	})
+	http.HandleFunc("/auth/logout", func(w http.ResponseWriter, r *http.Request) {
+		Auth.Logout(w, r, store)
+	})
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)
 }
