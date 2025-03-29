@@ -18,7 +18,7 @@ func main() {
 	DB := configurations.ConnectDB()
 	store := configurations.ConfigSessions()
 	http.HandleFunc("/auth/login", func(w http.ResponseWriter, r *http.Request) {
-		Auth.Login(w, r, store)
+		Auth.Login(w, r, store, DB)
 	})
 	http.HandleFunc("/auth/signup", func(w http.ResponseWriter, r *http.Request) {
 		Auth.SignUp(w, r, DB)

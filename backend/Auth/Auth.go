@@ -20,7 +20,7 @@ type User struct {
 
 // Replace with your own secret key
 
-func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) {
+func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, DB *sql.DB) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -41,18 +41,39 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) 
 		http.Error(w, "Failed to get session", http.StatusInternalServerError)
 		return
 	}
-	if user.Username == "shaeel" && user.Password == "123" {
-		session.Values["username"] = user.Username
-		session.Save(r, w)
-		response := map[string]string{
-			"message": "Login successful",
-			"user":    user.Username,
+	var dbUser User
+	var dbSalt []byte
+	err = DB.QueryRow("SELECT username, password, salt FROM users WHERE username=?", user.Username).Scan(&dbUser.Username, &dbUser.Password, &dbSalt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+		} else {
+			http.Error(w, "Failed to query database", http.StatusInternalServerError)
 		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-	} else {
-		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
 	}
+	hashedPassword := HashPassword(user.Password, dbSalt)
+	if hashedPassword != dbUser.Password {
+		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+		return
+	}
+	session.Values["username"] = user.Username
+	err = session.Save(r, w)
+	if err != nil {
+		http.Error(w, "Failed to save session", http.StatusInternalServerError)
+		return
+	}
+	type Response struct {
+		Message string `json:"message"`
+		User    string `json:"user"`
+	}
+	response := Response{
+		Message: "Logged in successfully",
+		User:    user.Username,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+
 }
 func SignUp(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 	if r.Method != http.MethodPost {
