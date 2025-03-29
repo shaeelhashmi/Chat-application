@@ -10,9 +10,11 @@ import (
 	"os"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/gorilla/sessions"
 	"github.com/joho/godotenv"
 )
 
+var store = sessions.NewCookieStore([]byte("secret-key")) // Replace with your own secret key
 var Db *sql.DB
 
 func ConnectDB() *sql.DB {
@@ -61,10 +63,40 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &user)
 	defer r.Body.Close()
 	fmt.Println(user.Username, user.Password)
-	response := map[string]string{
-		"message": "Login successful",
-		"user":    user.Username,
+
+	session, err := store.Get(r, "Login-session")
+	if err != nil {
+		http.Error(w, "Failed to get session", http.StatusInternalServerError)
+		return
 	}
+	if user.Username == "shaeel" && user.Password == "123" {
+		session.Values["username"] = user.Username
+		session.Save(r, w)
+		response := map[string]string{
+			"message": "Login successful",
+			"user":    user.Username,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	} else {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+	}
+}
+func IsloggedIn(w http.ResponseWriter, r *http.Request) {
+	session, err := store.Get(r, "Login-session")
+	if err != nil {
+		http.Error(w, "Failed to get session", http.StatusInternalServerError)
+		return
+	}
+	if session.Values["username"] == nil {
+		http.Error(w, "Not logged in", http.StatusUnauthorized)
+		return
+	}
+	response := map[string]string{
+		"message": "Logged in",
+		"user":    session.Values["username"].(string),
+	}
+	fmt.Println("Logged in user:", session.Values["username"].(string))
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }

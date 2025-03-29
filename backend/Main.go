@@ -14,12 +14,10 @@ func main() {
 		AllowedHeaders:   []string{"Content-Type"},
 		AllowCredentials: true,
 	})
-	http.HandleFunc("/auth/login", Auth.Login)
-	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	// 	fmt.Fprintln(w, "Hello, World!")
-	// })
-
 	Auth.ConnectDB()
+
+	http.HandleFunc("/auth/login", Auth.Login)
+	http.HandleFunc("/isloggedin", Auth.IsloggedIn)
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)
 }
