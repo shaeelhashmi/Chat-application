@@ -29,13 +29,7 @@ export default function Main() {
         if (user === "abcdef") setreciever("abcd");
     }, [user]);   
 useEffect(() => {
-    if (!user || !reciever) return; // Don't create WebSocket if user is empty
-    
-    if (user=='abcd')setreciever('abcdef');
-    if (user=='abcdef')setreciever('abcd');
-    console.log("UserName:", user);
-    console.log("Receiver:", reciever);
-    const socket = new WebSocket(`ws://localhost:8080/ws?sender=${user}&receiver=${reciever}`);
+    const socket = new WebSocket(`ws://localhost:8080/ws`);
     socketRef.current = socket;
 
     socket.addEventListener("open", () => {
@@ -64,7 +58,7 @@ useEffect(() => {
 
 const sendMessage = () => {
     if(!socketRef.current) {
-        const socket= new WebSocket(`ws://localhost:8080/ws?sender=${user}&receiver=${reciever}`);
+        const socket= new WebSocket(`ws://localhost:8080/ws`);
         socketRef.current = socket;
         socket.addEventListener("open", () => {
             console.log("WebSocket connected");
@@ -84,7 +78,11 @@ const sendMessage = () => {
     
     }
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-        const messageData =wsMessage;
+        const messageData = JSON.stringify({
+            sender: user,
+            reciever: reciever,
+            message: wsMessage,
+            });
         console.log("Sending message:", messageData);
         socketRef.current.send(messageData);
         setWsMessage("");

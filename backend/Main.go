@@ -4,7 +4,6 @@ import (
 	"chat-app-backend/Auth"
 	configurations "chat-app-backend/Configurations"
 	"chat-app-backend/Socket"
-	"fmt"
 	"net/http"
 
 	"github.com/rs/cors"
@@ -32,10 +31,8 @@ func main() {
 	http.HandleFunc("/auth/logout", func(w http.ResponseWriter, r *http.Request) {
 		Auth.Logout(w, r, store)
 	})
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		sender := r.URL.Query().Get("sender")
-		fmt.Println("Sender: ", sender)
-		Socket.SocketHandler(w, r, sender)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		Socket.SocketHandler(w, r)
 	})
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)

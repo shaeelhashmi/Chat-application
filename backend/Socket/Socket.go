@@ -1,12 +1,19 @@
 package Socket
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"sync"
 
 	"github.com/gorilla/websocket"
 )
+
+type Message struct {
+	Sender   string `json:"sender"`
+	Reciever string `json:"reciever"`
+	Message  string `json:"message"`
+}
 
 var connections = make(map[string]*websocket.Conn)
 var mu sync.Mutex
@@ -34,7 +41,7 @@ func SendMessage(receiver string, msg []byte) {
 	}
 }
 
-func SocketHandler(w http.ResponseWriter, r *http.Request, sender string) {
+func SocketHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		http.Error(w, "Failed to upgrade connection", http.StatusInternalServerError)
@@ -43,24 +50,29 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, sender string) {
 	defer conn.Close()
 
 	mu.Lock()
-	connections[sender] = conn
+
 	fmt.Println("Active Connections:", connections) // Debugging line
 	mu.Unlock()
 
-	receiver := r.URL.Query().Get("receiver")
-	fmt.Println("Receiver:", receiver)
-	if receiver == "" {
-		conn.WriteMessage(websocket.TextMessage, []byte("Receiver not found"))
-	}
-
+	var sender string
 	for {
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Println("Error reading message:", err)
 			break
 		}
-		fmt.Println("Message received from", sender, ":", string(msg))
-		go SendMessage(receiver, msg)
+		var messageData Message
+		if err := json.Unmarshal(msg, &messageData); err != nil {
+			fmt.Println("Invalid JSON format:", err)
+			continue
+		}
+		sender = messageData.Sender
+		receiver := messageData.Reciever
+		msg1 := messageData.Message
+		connections[sender] = conn
+		fmt.Println("Message received from", sender, ":", string(msg1))
+		msg1bytes := []byte(msg1)
+		go SendMessage(receiver, msg1bytes)
 	}
 
 	mu.Lock()
