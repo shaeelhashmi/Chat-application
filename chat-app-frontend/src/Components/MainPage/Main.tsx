@@ -85,7 +85,7 @@ const sendMessage = () => {
     return (
         <div>
             <ChatSideBar users={users}/>
-            <div className="ml-96">
+            {/* <div className="ml-96">
             <select value={reciever} onChange={(e) => setreciever(e.target.value)}>
                 {users.map((user) => (
                     <option key={user} value={user}>
@@ -100,7 +100,7 @@ const sendMessage = () => {
                     <p key={index}>{msg}</p>
                 ))}
             </div>
-            </div>
+            </div> */}
         </div>
     );
 }
