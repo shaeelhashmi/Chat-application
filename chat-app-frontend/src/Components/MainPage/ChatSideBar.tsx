@@ -2,6 +2,7 @@ import {useState,useEffect} from 'react';
 import MessageBody from './MessageBody';
 interface ChatSideBarProps {
     users: string[];
+    userName: string; 
 }
 export default function ChatSideBar(props: ChatSideBarProps) {
     const [receiver, setReceiver] = useState<string >("");
@@ -23,7 +24,7 @@ export default function ChatSideBar(props: ChatSideBarProps) {
     
     </aside>
     </div>
-    <MessageBody></MessageBody>
+    <MessageBody user={props.userName} reciever={receiver}></MessageBody>
     </div>
     </>
   )

@@ -9,7 +9,7 @@ export default function Main() {
     const [wsMessage, setWsMessage] = useState("");
     const [messages, setMessages] = useState<string[]>([]);
     const [reciever,setreciever] = useState("");
-    const socketRef = useRef<WebSocket | null>(null);
+  
     const [users, setUsers] = useState<string[]>([]);
     useEffect(() => {
         const fetchUser = async () => {
@@ -32,59 +32,10 @@ export default function Main() {
         }
         fetchusers();
     }, []);
-    const formConnection = async () => {
-        const socket = new WebSocket(`ws://localhost:8080/ws`);
-        socketRef.current = socket;
     
-        socket.addEventListener("open", () => {
-            console.log("WebSocket connected");
-        });
-    
-        socket.addEventListener("message", (event) => {
-            console.log("Message received:", event.data);
-            setMessages(prevMessages => [...prevMessages, event.data]);
-        });
-    
-        socket.addEventListener("close", () => {
-            console.log("WebSocket disconnected");
-        });
-    
-        socket.addEventListener("error", (error) => {
-            console.error("WebSocket error:", error);
-        });
-    
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.close();
-            }
-        };
-        }  
-useEffect(() => { 
-    formConnection();
-}, [user]);
-
-const sendMessage = () => {
-    if(!socketRef.current) {
-        formConnection();
-    
-    }
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-        const messageData = JSON.stringify({
-            sender: user,
-            reciever: reciever,
-            message: wsMessage,
-            });
-        console.log("Sending message:", messageData);
-        socketRef.current.send(messageData);
-        setWsMessage("");
-    } else {
-        console.error("WebSocket is not open");
-    }
-};
-
     return (
-        <div>
-            <ChatSideBar users={users}/>
+        <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+            <ChatSideBar users={users} userName={user}/>
             {/* <div className="ml-96">
             <select value={reciever} onChange={(e) => setreciever(e.target.value)}>
                 {users.map((user) => (

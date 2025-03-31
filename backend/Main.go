@@ -36,7 +36,7 @@ func main() {
 		users.ImportUsers(w, r, DB, store)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		Socket.SocketHandler(w, r)
+		Socket.SocketHandler(w, r, DB)
 	})
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)
