@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -14,6 +15,10 @@ type Message struct {
 	Sender   string `json:"sender"`
 	Reciever string `json:"reciever"`
 	Message  string `json:"message"`
+}
+type MessageResponse struct {
+	Data Message `json:"data"`
+	Time string  `json:"time"`
 }
 
 var connections = make(map[string]*websocket.Conn)
@@ -85,7 +90,6 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 		msg1 := messageData.Message
 		connections[sender] = conn
 		fmt.Println("Message received from", sender, ":", string(msg1))
-		msg1bytes := []byte(msg1)
 		stmt, err := DB.Prepare("INSERT INTO messsages (sender, reciever, message) VALUES (?, ?, ?)")
 		if err != nil {
 			fmt.Println("Error inserting message into database:", err)
@@ -103,8 +107,16 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			conn.Close()
 			return
 		}
-
-		go SendMessage(receiver, msg1bytes)
+		response := MessageResponse{
+			Data: messageData,
+			Time: time.Now().Format("2006-01-02 15:04:05"),
+		}
+		resposeBytes, err := json.Marshal(response)
+		if err != nil {
+			fmt.Println("Error marshalling response:", err)
+			continue
+		}
+		go SendMessage(receiver, resposeBytes)
 	}
 
 	mu.Lock()

@@ -6,7 +6,7 @@ interface propsInterface{
 }
 export default function MessageBody(props:propsInterface) {
 const [Messages, setMessages] = useState("")
-const [MessagesList, setMessagesList] = useState<string[]>([]);
+const [MessagesList, setMessagesList] = useState<any[]>([]);
 const messages = [
   { text: "Hello, how are you?", sender: "receiver" },
   { text: "I'm good, thanks! How about you?", sender: "sender" },
@@ -28,7 +28,10 @@ const formConnection = async () => {
     
         socket.addEventListener("message", (event) => {
             console.log("Message received:", event.data);
-            setMessagesList(prevMessages => [...prevMessages, event.data]);
+            console.log(event.data.data)
+            let parsedData = JSON.parse(event.data)
+  
+            setMessagesList(prevMessages => [...prevMessages,parsedData]);
         });
     
         socket.addEventListener("close", () => {
@@ -47,6 +50,8 @@ const formConnection = async () => {
         }  
         useEffect(() => {
           console.log("MessagesList updated:", MessagesList);
+          console.log(MessagesList[MessagesList.length-1])
+          console.log(MessagesList[MessagesList.length-1])
         },[MessagesList]);
 useEffect(() => { 
     formConnection();
