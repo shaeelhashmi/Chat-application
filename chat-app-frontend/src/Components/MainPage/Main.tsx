@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import ChatSideBar from "./ChatSideBar";
 
 export default function Main() {
     const navigate = useNavigate();
@@ -31,10 +32,6 @@ export default function Main() {
         }
         fetchusers();
     }, []);
-    useEffect(() => {
-        if (user === "abcd") setreciever("abcdef");
-        if (user === "abcdef") setreciever("abcd");
-    }, [user]); 
     const formConnection = async () => {
         const socket = new WebSocket(`ws://localhost:8080/ws`);
         socketRef.current = socket;
@@ -87,6 +84,8 @@ const sendMessage = () => {
 
     return (
         <div>
+            <ChatSideBar users={users}/>
+            <div className="ml-96">
             <select value={reciever} onChange={(e) => setreciever(e.target.value)}>
                 {users.map((user) => (
                     <option key={user} value={user}>
@@ -94,17 +93,13 @@ const sendMessage = () => {
                     </option>
                 ))}
             </select>
-            <button onClick={() => {
-                axios.get("http://localhost:8080/auth/logout", { withCredentials: true })
-                    .then(() => navigate("/auth/login"))
-                    .catch((err) => console.error("Logout error:", err));
-            }}>Logout</button>
             <input type="text" value={wsMessage} onChange={(e) => setWsMessage(e.target.value)} />
             <button onClick={sendMessage}>Send</button>
             <div>
                 {messages.map((msg, index) => (
                     <p key={index}>{msg}</p>
                 ))}
+            </div>
             </div>
         </div>
     );
