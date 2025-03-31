@@ -9,7 +9,7 @@ export default function Main() {
     const [messages, setMessages] = useState<string[]>([]);
     const [reciever,setreciever] = useState("");
     const socketRef = useRef<WebSocket | null>(null);
-
+    const [users, setUsers] = useState<string[]>([]);
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -21,48 +21,28 @@ export default function Main() {
             }
         };
         fetchUser();
-
-      
-    }, [navigate]);
+        const fetchusers =async () => {
+            try {
+                const response = await axios.get("http://localhost:8080/api/users", { withCredentials: true });
+                setUsers(response.data);
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            }
+        }
+        fetchusers();
+    }, []);
     useEffect(() => {
         if (user === "abcd") setreciever("abcdef");
         if (user === "abcdef") setreciever("abcd");
-    }, [user]);   
-useEffect(() => {
-    const socket = new WebSocket(`ws://localhost:8080/ws`);
-    socketRef.current = socket;
-
-    socket.addEventListener("open", () => {
-        console.log("WebSocket connected");
-    });
-
-    socket.addEventListener("message", (event) => {
-        console.log("Message received:", event.data);
-        setMessages(prevMessages => [...prevMessages, event.data]);
-    });
-
-    socket.addEventListener("close", () => {
-        console.log("WebSocket disconnected");
-    });
-
-    socket.addEventListener("error", (error) => {
-        console.error("WebSocket error:", error);
-    });
-
-    return () => {
-        if (socketRef.current) {
-            socketRef.current.close();
-        }
-    };
-}, [user]);
-
-const sendMessage = () => {
-    if(!socketRef.current) {
-        const socket= new WebSocket(`ws://localhost:8080/ws`);
+    }, [user]); 
+    const formConnection = async () => {
+        const socket = new WebSocket(`ws://localhost:8080/ws`);
         socketRef.current = socket;
+    
         socket.addEventListener("open", () => {
             console.log("WebSocket connected");
         });
+    
         socket.addEventListener("message", (event) => {
             console.log("Message received:", event.data);
             setMessages(prevMessages => [...prevMessages, event.data]);
@@ -75,6 +55,20 @@ const sendMessage = () => {
         socket.addEventListener("error", (error) => {
             console.error("WebSocket error:", error);
         });
+    
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.close();
+            }
+        };
+        }  
+useEffect(() => { 
+    formConnection();
+}, [user]);
+
+const sendMessage = () => {
+    if(!socketRef.current) {
+        formConnection();
     
     }
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
@@ -94,8 +88,11 @@ const sendMessage = () => {
     return (
         <div>
             <select value={reciever} onChange={(e) => setreciever(e.target.value)}>
-                <option value="abcd">abcd</option>
-                <option value="abcdef">abcdef</option>
+                {users.map((user) => (
+                    <option key={user} value={user}>
+                        {user}
+                    </option>
+                ))}
             </select>
             <button onClick={() => {
                 axios.get("http://localhost:8080/auth/logout", { withCredentials: true })

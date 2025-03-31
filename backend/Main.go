@@ -1,6 +1,7 @@
 package main
 
 import (
+	users "chat-app-backend/APIS"
 	"chat-app-backend/Auth"
 	configurations "chat-app-backend/Configurations"
 	"chat-app-backend/Socket"
@@ -30,6 +31,9 @@ func main() {
 	})
 	http.HandleFunc("/auth/logout", func(w http.ResponseWriter, r *http.Request) {
 		Auth.Logout(w, r, store)
+	})
+	http.HandleFunc("/api/users", func(w http.ResponseWriter, r *http.Request) {
+		users.ImportUsers(w, r, DB, store)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		Socket.SocketHandler(w, r)
