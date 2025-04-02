@@ -59,7 +59,15 @@ const formConnection = async () => {
         socket.addEventListener("error", (error) => {
             console.error("WebSocket error:", error);
         });
-    
+        socket.addEventListener("open", () => {
+          const testMessage = JSON.stringify({
+            sender: user,
+            reciever: "",
+            message: "Test message from socket",
+          });
+          console.log("Sending test message:", testMessage);
+          socket.send(testMessage);
+        });
         return () => {
             if (socketRef.current) {
                 socketRef.current.close();
@@ -74,10 +82,11 @@ useEffect(() => {
     await formConnection();
     }
     )()
-}, []);
+}, [user]);
 
 const sendMessage = () => {
     if(!socketRef.current) {
+      console.log("Socket is not initialized, creating a new one.");
         formConnection();
     
     }

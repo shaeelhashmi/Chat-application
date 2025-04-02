@@ -22,22 +22,6 @@ export default function Main() {
     return (
         <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
             <ChatSideBar users={users}/>
-            {/* <div className="ml-96">
-            <select value={reciever} onChange={(e) => setreciever(e.target.value)}>
-                {users.map((user) => (
-                    <option key={user} value={user}>
-                        {user}
-                    </option>
-                ))}
-            </select>
-            <input type="text" value={wsMessage} onChange={(e) => setWsMessage(e.target.value)} />
-            <button onClick={sendMessage}>Send</button>
-            <div>
-                {messages.map((msg, index) => (
-                    <p key={index}>{msg}</p>
-                ))}
-            </div>
-            </div> */}
         </div>
     );
 }

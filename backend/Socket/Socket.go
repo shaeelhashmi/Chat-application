@@ -90,6 +90,10 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 		msg1 := messageData.Message
 		connections[sender] = conn
 		fmt.Println("Message received from", sender, ":", string(msg1))
+		if receiver == "" {
+			fmt.Println("Receiver is empty, skipping message")
+			continue
+		}
 		stmt, err := DB.Prepare("INSERT INTO messsages (sender, reciever, message) VALUES (?, ?, ?)")
 		if err != nil {
 			fmt.Println("Error inserting message into database:", err)

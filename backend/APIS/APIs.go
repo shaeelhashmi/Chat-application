@@ -47,7 +47,6 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 		return
 	}
 	reciever := r.URL.Query().Get("reciever")
-	fmt.Println("Reciever:", reciever)
 	if reciever == "" {
 		http.Error(w, "Reciever is required", http.StatusBadRequest)
 		return

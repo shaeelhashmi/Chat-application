@@ -1,6 +1,8 @@
 import { useState } from "react"
 import axios from "axios"
+import { useNavigate } from "react-router-dom"
 export default function Login() {
+const navigate = useNavigate()
 const [error, setError] = useState<string>("")
 const [username, setUsername] = useState<string>("")
 const [password, setPassword] = useState<string>("")
@@ -26,8 +28,9 @@ const handleSubmit =async  (e: React.FormEvent<HTMLFormElement>) => {
         username: username,
         password: password
     }
-,{withCredentials: true})
+  ,{withCredentials: true})
     setError(res.data.message)
+    navigate("/chat")
     return 
 }catch(err:any) {
     setError(err.response.data)
