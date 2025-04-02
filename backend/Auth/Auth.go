@@ -123,17 +123,7 @@ func SignUp(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 		return
 	}
 	defer tx.Rollback()
-	_, err = tx.Exec(`
-CREATE TABLE IF NOT EXISTS users (
-username VARCHAR(15) NOT NULL PRIMARY KEY,
-password VARCHAR(255) NOT NULL,
-salt BLOB NOT NULL
-);`)
-	if err != nil {
-		http.Error(w, "Failed to prepare statement", http.StatusInternalServerError)
-		tx.Rollback()
-		return
-	}
+
 	var exists bool
 	err = DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE username=?)", user.Username).Scan(&exists)
 	if err != nil {

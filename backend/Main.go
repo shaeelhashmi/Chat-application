@@ -4,6 +4,7 @@ import (
 	apis "chat-app-backend/APIS"
 	"chat-app-backend/Auth"
 	configurations "chat-app-backend/Configurations"
+	friends "chat-app-backend/Friends"
 	"chat-app-backend/Socket"
 	"net/http"
 
@@ -41,6 +42,10 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		Socket.SocketHandler(w, r, DB)
 	})
+	http.HandleFunc("/addfriend", func(w http.ResponseWriter, r *http.Request) {
+		friends.AddFriend(w, r, DB, store)
+	})
+
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)
 }
