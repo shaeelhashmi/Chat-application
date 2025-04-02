@@ -17,8 +17,10 @@ type Message struct {
 	Message  string `json:"message"`
 }
 type MessageResponse struct {
-	Data Message `json:"data"`
-	Time string  `json:"time"`
+	Sender   string `json:"sender"`
+	Reciever string `json:"reciever"`
+	Message  string `json:"message"`
+	Time     string `json:"created_at"`
 }
 
 var connections = make(map[string]*websocket.Conn)
@@ -50,14 +52,12 @@ func SendMessage(receiver string, msg []byte) {
 func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 	tx, err := DB.Begin()
 	if err != nil {
-		fmt.Println("Error beginning transaction:", err)
 		http.Error(w, "Failed to begin transaction", http.StatusInternalServerError)
 		return
 	}
 	defer tx.Rollback()
 	_, err = DB.Exec("CREATE TABLE IF NOT EXISTS messsages (id INT AUTO_INCREMENT PRIMARY KEY, sender VARCHAR(255), reciever VARCHAR(255), message TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
 	if err != nil {
-		fmt.Println("Error duting transaction:", err)
 		http.Error(w, "Failed to prepare statement", http.StatusInternalServerError)
 		return
 	}
@@ -108,8 +108,10 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			return
 		}
 		response := MessageResponse{
-			Data: messageData,
-			Time: time.Now().Format("2006-01-02 15:04:05"),
+			messageData.Sender,
+			messageData.Reciever,
+			messageData.Message,
+			time.Now().Format("2006-01-02 15:04:05"),
 		}
 		resposeBytes, err := json.Marshal(response)
 		if err != nil {

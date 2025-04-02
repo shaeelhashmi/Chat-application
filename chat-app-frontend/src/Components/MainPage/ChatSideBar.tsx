@@ -1,7 +1,6 @@
 import MessageBody from './MessageBody';
 interface ChatSideBarProps {
     users: string[];
-    userName: string; 
 }
 export default function ChatSideBar(props: ChatSideBarProps) {
   return (  
@@ -19,7 +18,7 @@ export default function ChatSideBar(props: ChatSideBarProps) {
     
     </aside>
     </div>
-    <MessageBody user={props.userName} ></MessageBody>
+    <MessageBody  ></MessageBody>
     </div>
     </>
   )

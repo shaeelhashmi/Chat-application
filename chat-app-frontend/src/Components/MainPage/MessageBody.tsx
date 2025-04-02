@@ -1,13 +1,16 @@
 import SendMsg from "../SVG/SendMsg";
 import { useState,useEffect,useRef } from "react";
-interface propsInterface{
- user:string
-}
-export default function MessageBody(props:propsInterface) {
+import { useNavigate } from "react-router-dom";
+
+import axios from "axios";
+
+export default function MessageBody() {
 const queryParams = new URLSearchParams(window.location.search);
 const reciever = queryParams.get("reciever");
 const [Messages, setMessages] = useState("")
 const [MessagesList, setMessagesList] = useState<any[]>([]);
+const [user, setUser] = useState("");
+const navigate = useNavigate();
 const messages = [
   { text: "Hello, how are you?", sender: "receiver" },
   { text: "I'm good, thanks! How about you?", sender: "sender" },
@@ -19,6 +22,25 @@ const messages = [
   { text: "I'm good, thanks! How about you?", sender: "sender" },
 ];
 const socketRef = useRef<WebSocket | null>(null);
+const recieveMessages= async ()=>{
+  try {
+  const response=await axios.get(`http://localhost:8080/api/messages?reciever=${reciever}`,{withCredentials:true})
+  console.log(response.data)
+  setMessagesList(response.data);
+  }
+  catch (error) {
+    console.log("Error fetching messages:", error);
+  }
+}
+const fetchUser = async () => {
+  try {
+      const response = await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
+      setUser(response.data.user);
+  } catch (error) {
+      console.error("Error fetching user:", error);
+      navigate("/auth/login");
+  }
+};
 const formConnection = async () => {
         const socket = new WebSocket(`ws://localhost:8080/`);
         socketRef.current = socket;
@@ -54,9 +76,15 @@ const formConnection = async () => {
           console.log(MessagesList[MessagesList.length-1])
           console.log(MessagesList[MessagesList.length-1])
         },[MessagesList]);
+       
 useEffect(() => { 
-    formConnection();
-}, [props.user]);
+   (async () => {
+    await fetchUser();
+    await recieveMessages();
+    await formConnection();
+    }
+    )()
+}, [user]);
 
 const sendMessage = () => {
     if(!socketRef.current) {
@@ -65,7 +93,7 @@ const sendMessage = () => {
     }
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
         const messageData = JSON.stringify({
-            sender: props.user,
+            sender: user,
             reciever: reciever,
             message: Messages,
             });

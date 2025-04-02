@@ -1,25 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ChatSideBar from "./ChatSideBar";
 
 export default function Main() {
-  
-    const navigate = useNavigate();
-    const [user, setUser] = useState("");
-  
+
     const [users, setUsers] = useState<string[]>([]);
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const response = await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
-                setUser(response.data.user);
-            } catch (error) {
-                console.error("Error fetching user:", error);
-                navigate("/auth/login");
-            }
-        };
-        fetchUser();
+        
+      
         const fetchusers =async () => {
             try {
                 const response = await axios.get("http://localhost:8080/api/users", { withCredentials: true });
@@ -33,7 +21,7 @@ export default function Main() {
     
     return (
         <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
-            <ChatSideBar users={users} userName={user}/>
+            <ChatSideBar users={users}/>
             {/* <div className="ml-96">
             <select value={reciever} onChange={(e) => setreciever(e.target.value)}>
                 {users.map((user) => (
