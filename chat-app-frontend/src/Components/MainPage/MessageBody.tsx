@@ -3,24 +3,19 @@ import { useState,useEffect,useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
-
+interface Message {
+  sender: string;
+  reciever: string;
+  message: string;
+  created_at: string;
+}
 export default function MessageBody() {
 const queryParams = new URLSearchParams(window.location.search);
-const reciever = queryParams.get("reciever");
+const reciever = queryParams.get("reciever") || "";
 const [Messages, setMessages] = useState("")
-const [MessagesList, setMessagesList] = useState<any[]>([]);
+const [MessagesList, setMessagesList] = useState<Message[]>([]);
 const [user, setUser] = useState("");
 const navigate = useNavigate();
-const messages = [
-  { text: "Hello, how are you?", sender: "receiver" },
-  { text: "I'm good, thanks! How about you?", sender: "sender" },
-  { text: "I'm doing well, thanks for asking.", sender: "receiver" },
-  { text: "Hey! I'm good too, just working on some projects.", sender: "sender" },
-  { text: "I'm working on a chat application using React and TypeScript.", sender: "receiver" },
-  { text: "That's great to hear! What projects are you working on?", sender: "sender" },
-  { text: "Hello, how are you?", sender: "receiver" },
-  { text: "I'm good, thanks! How about you?", sender: "sender" },
-];
 const socketRef = useRef<WebSocket | null>(null);
 const recieveMessages= async ()=>{
   try {
@@ -84,7 +79,7 @@ useEffect(() => {
     await formConnection();
     }
     )()
-}, [user]);
+}, []);
 
 const sendMessage = () => {
     if(!socketRef.current) {
@@ -98,6 +93,7 @@ const sendMessage = () => {
             message: Messages,
             });
         console.log("Sending message:", messageData);
+        setMessagesList(prevMessages => [...prevMessages, { sender: user, reciever, message: Messages, created_at: new Date().toISOString() }]);
         socketRef.current.send(messageData);
         setMessages("");
     } else {
@@ -108,9 +104,9 @@ const sendMessage = () => {
   return (
     < >
     <div className=" h-full   mt-20 p-2 ml-[3%]">
-      {messages.map((message, index) => (
-        <div key={index} className={`flex  mt-4 ${message.sender=="sender"?"justify-end":""}`}>
-          <div className={`bg-[#141474] text-white p-4 rounded-lg w-[50%] `}>{message.text}</div>
+      {MessagesList.map((message, index) => (
+        <div key={index} className={`flex  mt-4 ${message.sender==user?"justify-end":""}`}>
+          <div className={`bg-[#141474] text-white p-4 rounded-lg w-[50%] `}>{message.message}</div>
         </div>
       ))}
 

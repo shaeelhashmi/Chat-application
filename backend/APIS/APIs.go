@@ -58,7 +58,7 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 		Message   string    `json:"message"`
 		CreatedAt time.Time `json:"created_at"`
 	}
-	rows, err := DB.Query("SELECT sender, reciever, message, created_at FROM messsages WHERE sender = ? AND reciever = ?", User.Values["username"], reciever)
+	rows, err := DB.Query("SELECT sender, reciever, message, created_at FROM messsages WHERE (sender = ? AND reciever = ?) OR (reciever = ? AND sender = ?)", User.Values["username"], reciever, User.Values["username"], reciever)
 	if err != nil {
 		fmt.Println("Error fetching messages:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
