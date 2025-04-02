@@ -1,7 +1,8 @@
 import { useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
-export default function Login() {
+import { useEffect } from "react"
+export default function Login(props:any) {
 const navigate = useNavigate()
 const [error, setError] = useState<string>("")
 const [username, setUsername] = useState<string>("")
@@ -37,6 +38,10 @@ const handleSubmit =async  (e: React.FormEvent<HTMLFormElement>) => {
 }
 
 }
+useEffect(() => {
+  props.func()
+},[])
+
   return (
     <div className="flex items-center justify-center h-screen m-0">
       <form className="p-3 h-[400px] w-[350px] bg-white text-md border-2 border-solid shadow-lg" onSubmit={handleSubmit} >

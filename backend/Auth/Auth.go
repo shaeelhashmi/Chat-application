@@ -188,7 +188,7 @@ func generateRandomSalt(saltSize int) []byte {
 func IsloggedIn(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, DB *sql.DB) {
 	session, err := store.Get(r, "Login-session")
 	if err != nil {
-		http.Error(w, "Failed to get session", http.StatusInternalServerError)
+		http.Error(w, "Failed to get session", http.StatusUnauthorized)
 		return
 	}
 	if session.Values["username"] == nil {

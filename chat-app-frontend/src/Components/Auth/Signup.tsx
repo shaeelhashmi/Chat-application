@@ -1,6 +1,7 @@
 import { useState } from "react"
 import axios from "axios"
-export default function Signup() {
+import { useEffect } from "react"
+export default function Signup(props:any) {
  const [error, setError] = useState<string>("")
  const [username, setUsername] = useState<string>("")
  const [password, setPassword] = useState<string>("")
@@ -34,6 +35,9 @@ export default function Signup() {
         setError(err.response.data)
     }
  }
+ useEffect(() => {
+   props.func()
+ },[])
   return (
     <div className="flex items-center justify-center h-screen m-0">
     <form action="" className="p-3 h-[400px] w-[350px] bg-white border-2 border-solid shadow-lg text-md" onSubmit={handleSubmit} >

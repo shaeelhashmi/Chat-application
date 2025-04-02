@@ -1,7 +1,6 @@
 import SendMsg from "../SVG/SendMsg";
 import { useState,useEffect,useRef } from "react";
 import { useNavigate } from "react-router-dom";
-
 import axios from "axios";
 interface Message {
   sender: string;
@@ -106,11 +105,22 @@ const sendMessage = () => {
 };
 
   return (
-    < >
+    reciever==""?
+    <>
+    <div className="mt-20 flex justify-center items-center flex-col text-white p-3 ">
+    <div className="my-5 bg-gradient-to-r from-slate-500 to-purple-200 text-transparent bg-clip-text text-5xl font-bold">
+      <h1>Welcome to We Chat</h1>
+    </div>
+    <div className="my-5"><p className="text-base" >Select a chat to start messaging</p></div>
+    </div>
+    </>
+    :< >
     <div className=" h-full   mt-20 p-2 ml-[3%]">
       {MessagesList?.map((message, index) => (
         <div key={index} className={`flex  mt-4 ${message.sender==user?"justify-end":""}`}>
-          <div className={`bg-[#141474] text-white p-4 rounded-lg w-[50%] `}>{message.message}</div>
+          <div className={`bg-[#141474] text-white p-4 rounded-lg w-[50%] `}>
+            <div><p>{message.message}</p></div>
+            <div><p className="text-sm font-light text-end">{new Date(message.created_at).toLocaleString()}</p></div></div>
         </div>
       ))}
 
@@ -122,10 +132,16 @@ const sendMessage = () => {
           placeholder="Type a message..."
           value={Messages}
           onChange={(e) => setMessages(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          }}
         />
         </div >
         <div className=" border-none items-center content-center flex justify-center ">
-        <button className=" bg-white hover:bg-[#e2e1e1] transition-all p-3 rounded-md duration-500" onClick={sendMessage}><SendMsg></SendMsg></button>
+        <button className={` bg-white hover:bg-[#e2e1e1] transition-all p-3 rounded-md duration-500 ${Messages.trim()==""?" hidden":""}`} onClick={sendMessage}><SendMsg></SendMsg></button>
         </div>
         </div>
       </div>
