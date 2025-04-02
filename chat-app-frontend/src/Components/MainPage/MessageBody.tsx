@@ -13,7 +13,7 @@ export default function MessageBody() {
 const queryParams = new URLSearchParams(window.location.search);
 const reciever = queryParams.get("reciever") || "";
 const [Messages, setMessages] = useState("")
-const [MessagesList, setMessagesList] = useState<Message[]>([]);
+const [MessagesList, setMessagesList] = useState<Message[] | null>([]);
 const [user, setUser] = useState("");
 const navigate = useNavigate();
 const socketRef = useRef<WebSocket | null>(null);
@@ -49,7 +49,7 @@ const formConnection = async () => {
             console.log(event.data.data)
             let parsedData = JSON.parse(event.data)
   
-            setMessagesList(prevMessages => [...prevMessages,parsedData]);
+            setMessagesList(prevMessages => [...(prevMessages || []), parsedData]);
         });
     
         socket.addEventListener("close", () => {
@@ -66,11 +66,6 @@ const formConnection = async () => {
             }
         };
         }  
-        useEffect(() => {
-          console.log("MessagesList updated:", MessagesList);
-          console.log(MessagesList[MessagesList.length-1])
-          console.log(MessagesList[MessagesList.length-1])
-        },[MessagesList]);
        
 useEffect(() => { 
    (async () => {
@@ -93,7 +88,7 @@ const sendMessage = () => {
             message: Messages,
             });
         console.log("Sending message:", messageData);
-        setMessagesList(prevMessages => [...prevMessages, { sender: user, reciever, message: Messages, created_at: new Date().toISOString() }]);
+        setMessagesList(prevMessages => [...(prevMessages||[]), { sender: user, reciever, message: Messages, created_at: new Date().toISOString() }]);
         socketRef.current.send(messageData);
         setMessages("");
     } else {
@@ -104,7 +99,7 @@ const sendMessage = () => {
   return (
     < >
     <div className=" h-full   mt-20 p-2 ml-[3%]">
-      {MessagesList.map((message, index) => (
+      {MessagesList?.map((message, index) => (
         <div key={index} className={`flex  mt-4 ${message.sender==user?"justify-end":""}`}>
           <div className={`bg-[#141474] text-white p-4 rounded-lg w-[50%] `}>{message.message}</div>
         </div>
