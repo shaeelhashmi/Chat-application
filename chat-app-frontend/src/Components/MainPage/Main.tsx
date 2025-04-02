@@ -1,14 +1,12 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ChatSideBar from "./ChatSideBar";
 
 export default function Main() {
+  
     const navigate = useNavigate();
     const [user, setUser] = useState("");
-    const [wsMessage, setWsMessage] = useState("");
-    const [messages, setMessages] = useState<string[]>([]);
-    const [reciever,setreciever] = useState("");
   
     const [users, setUsers] = useState<string[]>([]);
     useEffect(() => {

@@ -27,11 +27,9 @@ const handleSubmit =async  (e: React.FormEvent<HTMLFormElement>) => {
         password: password
     }
 ,{withCredentials: true})
-    console.log(res.data)
     setError(res.data.message)
     return 
 }catch(err:any) {
-    console.log(err.response.data)
     setError(err.response.data)
 }
 

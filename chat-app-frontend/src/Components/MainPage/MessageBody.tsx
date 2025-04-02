@@ -1,10 +1,11 @@
 import SendMsg from "../SVG/SendMsg";
 import { useState,useEffect,useRef } from "react";
 interface propsInterface{
- reciever:string;
  user:string
 }
 export default function MessageBody(props:propsInterface) {
+const queryParams = new URLSearchParams(window.location.search);
+const reciever = queryParams.get("reciever");
 const [Messages, setMessages] = useState("")
 const [MessagesList, setMessagesList] = useState<any[]>([]);
 const messages = [
@@ -65,7 +66,7 @@ const sendMessage = () => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
         const messageData = JSON.stringify({
             sender: props.user,
-            reciever: props.reciever,
+            reciever: reciever,
             message: Messages,
             });
         console.log("Sending message:", messageData);

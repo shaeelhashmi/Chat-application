@@ -12,8 +12,7 @@ function App() {
 
     <Route path='/auth/login' element={<Login></Login>}></Route>
     <Route path='/auth/signup' element={<Signup></Signup>}></Route>
-    <Route path='/' element={<><Navbar/><Main></Main></>}></Route>
-
+    <Route path='/chat/' element={<><Navbar/><Main></Main></>}></Route>
     </Routes>
     </Router>
   )
