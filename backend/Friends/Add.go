@@ -59,7 +59,7 @@ func AddFriend(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessio
 		return
 	}
 
-	_, err = tx.Exec("INSERT INTO friends (user1, user2) VALUES (?, ?)", user, username.Username)
+	_, err = tx.Exec("INSERT INTO friends (sender, receiver) VALUES (?, ?)", user, username.Username)
 	if err != nil {
 		if mysqlErr, ok := err.(*mysql.MySQLError); ok && mysqlErr.Number == 1062 {
 			http.Error(w, "Friend request already exists", http.StatusConflict)

@@ -21,7 +21,7 @@ export default function FriendPopup(props: FriendPopupProps) {
                username:friend
             },{withCredentials: true})
             if (response.status === 200) {
-                console.log("Friend added successfully")
+                setError("Friend added successfully")
             } else {
                 console.log("Error adding friend")
             }
