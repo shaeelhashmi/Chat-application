@@ -19,7 +19,7 @@ export default function Navbar(props: NavbarProps) {
       <div className="w-full pr-10 relative top-1">
         <Link to="/users/online" className="text-white w-[49px] p-2 bg-[#000000] bg-opacity-50 rounded-lg hover:shadow-xl duration-500 transition-all mx-3">Online</Link>
         <Link to="/requests/pending" className="text-white w-[49px] p-2 bg-[#000000] bg-opacity-50 rounded-lg hover:shadow-xl duration-500 transition-all mx-3">Pending requests</Link>
-        <Link to="/request/sent" className="text-white w-[49px] p-2 bg-[#000000] bg-opacity-50 rounded-lg hover:shadow-xl duration-500 transition-all mx-3">Sent requests</Link>
+        <Link to="/requests/sent" className="text-white w-[49px] p-2 bg-[#000000] bg-opacity-50 rounded-lg hover:shadow-xl duration-500 transition-all mx-3">Sent requests</Link>
       </div>
        <div className="flex justify-end w-full ">
        <div className=" pr-10">

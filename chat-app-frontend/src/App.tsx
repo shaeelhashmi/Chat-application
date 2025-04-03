@@ -2,9 +2,11 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
 import Login from "./Components/Auth/Login"
 import Signup from "./Components/Auth/Signup"
-import Main from './Components/MainPage/Main'
 import Navbar from './Components/Navbar/Navbar'
+import SentRequest from './Components/Requests/SentRequest'
 import axios from 'axios'
+import ChatSideBar from './Components/MainPage/ChatSideBar'
+import MessageBody from './Components/MainPage/MessageBody'
 import { useEffect, useState } from 'react'
 function App() {
   return (
@@ -47,7 +49,24 @@ function AppRoutes() {
     <Routes>
       <Route path='/auth/login' element={<Login func={fetchUser} />} />
       <Route path='/auth/signup' element={<Signup func={fetchUser} />} />
-      <Route path='/chat/' element={<><Navbar users={users}/><Main /></>} />
+      <Route path='/chat' element={
+      <>
+      <Navbar users={users}/>     
+      <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+      <ChatSideBar users={users}/>
+      <MessageBody  ></MessageBody>
+      </div>
+       </>} />
+      <Route path='/requests/sent' element={
+      <>
+      <Navbar users={users}/>
+      <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+      <ChatSideBar users={users}/>
+      <SentRequest  ></SentRequest>
+      </div>
+      </>
+    } 
+    />
     </Routes>
   );
 }

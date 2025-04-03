@@ -1,4 +1,4 @@
-import MessageBody from './MessageBody';
+
 import { Link } from 'react-router-dom';
 interface ChatSideBarProps {
     users: string[];
@@ -6,7 +6,7 @@ interface ChatSideBarProps {
 export default function ChatSideBar(props: ChatSideBarProps) {
   return (  
     <>
-    <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+   
     <div>
     <aside className="w-1/5 bg-[#13135b] p-4  h-screen fixed left-0 mx-0 overflow-y-auto">
         <div className="mt-16">
@@ -19,8 +19,8 @@ export default function ChatSideBar(props: ChatSideBarProps) {
     
     </aside>
     </div>
-    <MessageBody  ></MessageBody>
-    </div>
+
+  
     </>
   )
 }

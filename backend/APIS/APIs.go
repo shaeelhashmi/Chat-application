@@ -90,3 +90,44 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(messages)
 }
+
+func SentRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
+	User, err := store.Get(r, "Login-session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var sentRequests []struct {
+		Reciever  string    `json:"reciever"`
+		CreatedAt time.Time `json:"created_at"`
+	}
+	rows, err := DB.Query("SELECT receiver, created_at FROM friends WHERE sender = ? AND status=?", User.Values["username"], "pending")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var request struct {
+			Reciever  string    `json:"reciever"`
+			CreatedAt time.Time `json:"created_at"`
+		}
+		var createdAt string
+		if err := rows.Scan(&request.Reciever, &createdAt); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		request.CreatedAt, err = time.Parse("2006-01-02 15:04:05", createdAt)
+		if err != nil {
+
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		sentRequests = append(sentRequests, request)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(sentRequests)
+
+}
