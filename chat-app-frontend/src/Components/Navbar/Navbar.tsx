@@ -1,20 +1,27 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FriendPopup from "./Popups/FriendPopup";
 import { Link } from "react-router-dom";
+import {useSelector} from "react-redux";
 interface NavbarProps {
   users: string[];
 }
 export default function Navbar(props: NavbarProps) {
+  const [user,setUser]=useState<string>("")
+  const selector=useSelector((state:any)=>state.userName)
   const [showPopup, setShowPopup] = useState(false);
     const navigate = useNavigate();
+    useEffect(() => {
+      setUser(selector.userName)
+      console.log(selector.userName)
+    },[selector])
   return (
     <div className="fixed top-0 w-screen p-3 pt-4 bg-[#13135b] flex z-50  border-b-2 border-[#000000] ">
       {showPopup && <FriendPopup users={props.users} setState={setShowPopup}/>}
 
       <div className=" w-1/2 pr-10">
-        <h1 className="text-white text-2xl font-bold">We chat</h1>
+        <h1 className="text-white text-2xl font-bold">{user}</h1>
       </div>
       <div className="w-full pr-10 relative top-1">
         <Link to="/users/online" className="text-white w-[49px] p-2 bg-[#000000] bg-opacity-50 rounded-lg hover:shadow-xl duration-500 transition-all mx-3">Online</Link>

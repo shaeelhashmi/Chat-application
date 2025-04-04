@@ -2,6 +2,8 @@ import SendMsg from "../SVG/SendMsg";
 import { useState,useEffect,useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setUsername } from "../Slice/UserName";
 interface Message {
   sender: string;
   reciever: string;
@@ -9,6 +11,7 @@ interface Message {
   created_at: string;
 }
 export default function MessageBody() {
+const dispatch = useDispatch()
 const queryParams = new URLSearchParams(window.location.search);
 const reciever = queryParams.get("reciever") || "";
 const [Messages, setMessages] = useState("")
@@ -30,6 +33,7 @@ const fetchUser = async () => {
   try {
       const response = await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
       setUser(response.data.user);
+      dispatch(setUsername(response.data.user))
   } catch (error) {
       console.error("Error fetching user:", error);
       navigate("/auth/login");

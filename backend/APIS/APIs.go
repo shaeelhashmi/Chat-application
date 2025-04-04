@@ -58,6 +58,7 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 		CreatedAt time.Time `json:"created_at"`
 	}
 	rows, err := DB.Query("SELECT sender, reciever, message, created_at FROM messsages WHERE (sender = ? AND reciever = ?) OR (reciever = ? AND sender = ?)", User.Values["username"], reciever, User.Values["username"], reciever)
+	fmt.Println(rows)
 	if err != nil {
 		fmt.Println("Error fetching messages:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -98,10 +99,11 @@ func SentRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *ses
 		return
 	}
 	var sentRequests []struct {
+		ID        int       `json:"id"`
 		Reciever  string    `json:"reciever"`
 		CreatedAt time.Time `json:"created_at"`
 	}
-	rows, err := DB.Query("SELECT receiver, created_at FROM friends WHERE sender = ? AND status=?", User.Values["username"], "pending")
+	rows, err := DB.Query("SELECT id,receiver, created_at FROM friends WHERE sender = ? AND status=?", User.Values["username"], "pending")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -110,11 +112,12 @@ func SentRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *ses
 
 	for rows.Next() {
 		var request struct {
+			ID        int       `json:"id"`
 			Reciever  string    `json:"reciever"`
 			CreatedAt time.Time `json:"created_at"`
 		}
 		var createdAt string
-		if err := rows.Scan(&request.Reciever, &createdAt); err != nil {
+		if err := rows.Scan(&request.ID, &request.Reciever, &createdAt); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
