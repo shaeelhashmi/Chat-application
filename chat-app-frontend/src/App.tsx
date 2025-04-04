@@ -7,6 +7,9 @@ import SentRequest from './Components/Requests/SentRequest'
 import axios from 'axios'
 import ChatSideBar from './Components/MainPage/ChatSideBar'
 import MessageBody from './Components/MainPage/MessageBody'
+import { setUsername } from './Components/Slice/UserName'
+import { useDispatch } from 'react-redux'
+
 import { useEffect, useState } from 'react'
 function App() {
   return (
@@ -19,6 +22,16 @@ function App() {
 // Move fetchUser inside a component inside <Router>
 function AppRoutes() {
   const [users, setUsers] = useState<string[]>([]);
+
+  const dispatch = useDispatch()
+  const fetchUserName = async () => {
+    try {
+        const response = await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
+        dispatch(setUsername(response.data.user))
+    } catch (error) {
+        console.error("Error fetching user:", error);
+    }
+  };
   useEffect(() => {
       
     
@@ -30,6 +43,7 @@ function AppRoutes() {
               console.error("Error fetching users:", error);
           }
       }
+      fetchUserName();
       fetchusers();
   }, []);
   
