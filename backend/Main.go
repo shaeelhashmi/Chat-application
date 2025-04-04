@@ -43,13 +43,16 @@ func main() {
 		Socket.SocketHandler(w, r, DB)
 	})
 	http.HandleFunc("/addfriend", func(w http.ResponseWriter, r *http.Request) {
-		friends.AddFriend(w, r, DB, store)
+		friends.SendFriendRequest(w, r, DB, store)
 	})
 	http.HandleFunc("/requests/sent", func(w http.ResponseWriter, r *http.Request) {
 		apis.SentRequests(w, r, DB, store)
 	})
 	http.HandleFunc("/requests/recieved", func(w http.ResponseWriter, r *http.Request) {
 		apis.RecievedRequests(w, r, DB, store)
+	})
+	http.HandleFunc("/acceptrequest", func(w http.ResponseWriter, r *http.Request) {
+		friends.AcceptRequests(w, r, DB)
 	})
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)

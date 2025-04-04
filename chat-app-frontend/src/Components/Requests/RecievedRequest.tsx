@@ -11,7 +11,17 @@ export default function RecievedRequest() {
         } 
         fetchData()
     },[])
-
+    const handleAccept = async (requestId: string) => {
+        try {
+            
+             await axios.post(`http://localhost:8080/acceptrequest`, {
+              ID: requestId
+            }, { withCredentials: true })
+            setRecievedRequests((prevRequests) => prevRequests.filter((request:any) => request.id !== requestId))
+        } catch (error) {
+            console.error("Error accepting request:", error)
+        }
+    }
   return (
     <div className="mt-20">
       {
@@ -21,7 +31,7 @@ export default function RecievedRequest() {
               <span>{request.sender}</span>
             </div>
             <div className="flex items-center">
-                <button className="ml-5 p-1 bg-green-700 text-white rounded-lg"><Tick/></button>
+                <button className="ml-5 p-1 bg-green-700 text-white rounded-lg" onClick={()=>handleAccept(request.id)}><Tick/></button>
                 <button className="ml-5 p-1 bg-red-700 text-white rounded-lg"><Cross/></button>           
             </div>
           </div>

@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-func AddFriend(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
+func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
 	var username struct {
 		Username string `json:"username"`
 	}
@@ -72,6 +72,31 @@ func AddFriend(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessio
 	err = tx.Commit()
 	if err != nil {
 		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+func AcceptRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
+
+	data, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println("Error reading request body:", err)
+		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+		return
+	}
+	var id struct {
+		ID int
+	}
+	err = json.Unmarshal(data, &id)
+	if err != nil {
+		fmt.Println("Error reading request body:", err)
+		http.Error(w, "Failed to unmarshal request body", http.StatusBadRequest)
+		return
+	}
+	_, err = DB.Exec("UPDATE friends SET status = 'accepted' WHERE id=?", id.ID)
+	if err != nil {
+		fmt.Println("Error checking if user exists:", err)
+		http.Error(w, "Failed to check if user exists", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
