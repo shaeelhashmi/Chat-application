@@ -11,6 +11,7 @@ import { setUsername } from './Components/Slice/UserName'
 import { useDispatch } from 'react-redux'
 import HomePage from './Components/MainPage/HomePage'
 import { useEffect, useState } from 'react'
+import RecievedRequest from './Components/Requests/RecievedRequest'
 function App() {
   return (
     <Router>
@@ -55,7 +56,6 @@ function AppRoutes() {
       navigate("/chat");
     } catch (error) {
       console.error("Error fetching user:", error);
-      navigate("/auth/login");
     }
   };
 
@@ -83,12 +83,20 @@ function AppRoutes() {
       <MessageBody  ></MessageBody>
       </div>
        </>} />
-       <Route path='/chat/' element={
+       <Route path='/chat' element={
       <>
       <Navbar users={users}/>     
       <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
       <ChatSideBar users={users}/>
       <HomePage  ></HomePage>
+      </div>
+       </>} />
+       <Route path='/requests/recieved' element={
+      <>
+      <Navbar users={users}/>     
+      <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+      <ChatSideBar users={users}/>
+      <RecievedRequest  ></RecievedRequest>
       </div>
        </>} />
     </Routes>

@@ -2,21 +2,24 @@ import { useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { useEffect } from "react"
+import { useDispatch } from "react-redux"
+import { setUsername } from "../Slice/UserName"
 export default function Login(props:any) {
+  const dispatch = useDispatch()
 const navigate = useNavigate()
 const [error, setError] = useState<string>("")
-const [username, setUsername] = useState<string>("")
+const [user, setUser] = useState<string>("")
 const [password, setPassword] = useState<string>("")
 const handleSubmit =async  (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if(username.length > 15) {
+    if(user.length > 15) {
         setError("Username must be less than 15 characters")
         return 
-    } else if (username.length < 3) {
+    } else if (user.length < 3) {
         setError("Username must be more than 3 characters")
         return 
     }
-    else if (username === "") {
+    else if (user === "") {
         setError("Username is required")
         return 
     } else if (password === "") {
@@ -26,12 +29,13 @@ const handleSubmit =async  (e: React.FormEvent<HTMLFormElement>) => {
     try
     {
     const res=await axios.post("http://localhost:8080/auth/login", {
-        username: username,
+        username: user,
         password: password
     }
   ,{withCredentials: true})
     setError(res.data.message)
-    navigate("/chat")
+   dispatch(setUsername(res.data.user))
+   navigate("/chat")
     return 
 }catch(err:any) {
     setError(err.response.data)
@@ -49,7 +53,7 @@ useEffect(() => {
         <div className="flex flex-col ">
             <label htmlFor="username">Username:</label>
         <input type="text" name="username" id="username" placeholder="nick"  className="w-[90%] my-4 h-10 rounded-sm p-2 mx-auto border-b-2 border-solid bg-[#F5F5F5]"
-        value={username}
+        value={user}
         onChange={(e) =>{
             const value = e.target.value.replace(/\W/g, '')
             const lowerCaseValue = value.toLowerCase();
@@ -58,7 +62,7 @@ useEffect(() => {
             } else {
                 setError("")
             }
-            setUsername(lowerCaseValue)
+            setUser(lowerCaseValue)
         }}
       />
         

@@ -48,6 +48,9 @@ func main() {
 	http.HandleFunc("/requests/sent", func(w http.ResponseWriter, r *http.Request) {
 		apis.SentRequests(w, r, DB, store)
 	})
+	http.HandleFunc("/requests/recieved", func(w http.ResponseWriter, r *http.Request) {
+		apis.RecievedRequests(w, r, DB, store)
+	})
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)
 }
