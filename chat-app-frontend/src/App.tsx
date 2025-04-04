@@ -9,7 +9,7 @@ import ChatSideBar from './Components/MainPage/ChatSideBar'
 import MessageBody from './Components/MainPage/MessageBody'
 import { setUsername } from './Components/Slice/UserName'
 import { useDispatch } from 'react-redux'
-
+import HomePage from './Components/MainPage/HomePage'
 import { useEffect, useState } from 'react'
 function App() {
   return (
@@ -63,7 +63,19 @@ function AppRoutes() {
     <Routes>
       <Route path='/auth/login' element={<Login func={fetchUser} />} />
       <Route path='/auth/signup' element={<Signup func={fetchUser} />} />
-      <Route path='/chat' element={
+      
+      <Route path='/requests/sent' element={
+      <>
+      <Navbar users={users}/>
+      <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+      <ChatSideBar users={users}/>
+      <SentRequest  ></SentRequest>
+      
+      </div>
+      </>
+    } 
+    />
+    <Route path='/chat/:id' element={
       <>
       <Navbar users={users}/>     
       <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
@@ -71,16 +83,14 @@ function AppRoutes() {
       <MessageBody  ></MessageBody>
       </div>
        </>} />
-      <Route path='/requests/sent' element={
+       <Route path='/chat/' element={
       <>
-      <Navbar users={users}/>
+      <Navbar users={users}/>     
       <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
       <ChatSideBar users={users}/>
-      <SentRequest  ></SentRequest>
+      <HomePage  ></HomePage>
       </div>
-      </>
-    } 
-    />
+       </>} />
     </Routes>
   );
 }

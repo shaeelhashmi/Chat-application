@@ -1,6 +1,7 @@
 import SendMsg from "../SVG/SendMsg";
 import { useState,useEffect,useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 interface Message {
   sender: string;
@@ -9,8 +10,8 @@ interface Message {
   created_at: string;
 }
 export default function MessageBody() {
-const queryParams = new URLSearchParams(window.location.search);
-const reciever = queryParams.get("reciever") || "";
+  const params = useParams<{ id?: string }>();
+const reciever = params.id || "";
 const [Messages, setMessages] = useState("")
 const [MessagesList, setMessagesList] = useState<Message[] | null>([]);
 const [user, setUser] = useState("");
@@ -76,6 +77,7 @@ const formConnection = async () => {
         }  
        
 useEffect(() => { 
+  console.log(params.id);
    (async () => {
     await fetchUser();
     await recieveMessages();
@@ -106,16 +108,7 @@ const sendMessage = () => {
 };
 
   return (
-    reciever==""?
-    <>
-    <div className="mt-20 flex justify-center items-center flex-col text-white p-3 ">
-    <div className="my-5 bg-gradient-to-r from-slate-500 to-purple-200 text-transparent bg-clip-text text-5xl font-bold">
-      <h1>Welcome to We Chat</h1>
-    </div>
-    <div className="my-5"><p className="text-base" >Select a chat to start messaging</p></div>
-    </div>
-    </>
-    :< >
+  < >
     <div className=" h-full   mt-20 p-2 ml-[3%]">
       {MessagesList?.map((message, index) => (
         <div key={index} className={`flex  mt-4 ${message.sender==user?"justify-end":""}`}>
