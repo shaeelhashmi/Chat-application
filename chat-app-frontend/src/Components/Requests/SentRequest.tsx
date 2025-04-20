@@ -17,6 +17,14 @@ export default function SentRequest() {
         }
         fetchSentRequests()
     }, [])
+    const handleDeleteRequest = async (requestId:any) => {
+        try {
+            await axios.delete(`http://localhost:8080/delete/sentrequest?id=${requestId}`, {withCredentials:true});
+            setSentRequests((prevRequests) => prevRequests.filter((request:any) => request.id !== requestId));
+        } catch (error) {
+            console.error("Error deleting request:", error);
+        }
+    }
   return (
     <div className="mt-20">
       {
@@ -27,7 +35,7 @@ export default function SentRequest() {
             </div>
             <div className="flex items-center">
   
-                <button className="ml-5 p-1 bg-red-700 text-white rounded-lg">Delete request</button>           
+                <button className="ml-5 p-1 bg-red-700 text-white rounded-lg" onClick={()=>handleDeleteRequest(request.id)}>Delete request</button>           
             </div>
           </div>
         ))

@@ -13,7 +13,6 @@ export default function RecievedRequest() {
     },[])
     const handleAccept = async (requestId: string) => {
         try {
-            
              await axios.post(`http://localhost:8080/acceptrequest`, {
               ID: requestId
             }, { withCredentials: true })

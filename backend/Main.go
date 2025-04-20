@@ -62,6 +62,9 @@ func main() {
 
 		delete.DeleteReceivedRequest(w, r, DB, store)
 	})
+	http.HandleFunc("/delete/sentrequest", func(w http.ResponseWriter, r *http.Request) {
+		delete.DeleteSentRequest(w, r, DB, store)
+	})
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)
 }
