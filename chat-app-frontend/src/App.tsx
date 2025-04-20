@@ -20,7 +20,6 @@ function App() {
   )
 }
 
-// Move fetchUser inside a component inside <Router>
 function AppRoutes() {
   const [users, setUsers] = useState<string[]>([]);
   const [friends,setFriends] = useState<string[]>([]);
@@ -86,7 +85,7 @@ function AppRoutes() {
       <>
       <Navbar users={users}/>
       <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
-      <ChatSideBar users={users}/>
+      <ChatSideBar users={friends}/>
       <SentRequest  ></SentRequest>
       
       </div>

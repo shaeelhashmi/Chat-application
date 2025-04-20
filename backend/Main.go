@@ -5,6 +5,7 @@ import (
 	"chat-app-backend/Auth"
 	configurations "chat-app-backend/Configurations"
 	friends "chat-app-backend/Friends"
+	delete "chat-app-backend/Friends/DeleteRequests"
 	"chat-app-backend/Socket"
 	"net/http"
 
@@ -14,7 +15,7 @@ import (
 func main() {
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:5173"},
-		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS", "DELETE"},
 		AllowedHeaders:   []string{"Content-Type"},
 		AllowCredentials: true,
 	})
@@ -56,6 +57,10 @@ func main() {
 	})
 	http.HandleFunc("/api/friends", func(w http.ResponseWriter, r *http.Request) {
 		apis.Friends(w, r, DB, store)
+	})
+	http.HandleFunc("/delete/request", func(w http.ResponseWriter, r *http.Request) {
+
+		delete.DeleteReceivedRequest(w, r, DB, store)
 	})
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)

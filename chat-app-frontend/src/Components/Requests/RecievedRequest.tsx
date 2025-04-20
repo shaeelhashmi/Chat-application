@@ -22,6 +22,17 @@ export default function RecievedRequest() {
             console.error("Error accepting request:", error)
         }
     }
+    const handleReject = async (requestId: string) => {
+        try {
+            await axios.delete(`http://localhost:8080/delete/request?id=${requestId}`, {
+              withCredentials: true
+            })
+            setRecievedRequests((prevRequests) => prevRequests.filter((request:any) => request.id !== requestId))
+        } catch (error:any) {
+            console.error("Error rejecting request:", error)
+            console.log(error)
+        }
+    }
   return (
     <div className="mt-20">
       {
@@ -32,7 +43,7 @@ export default function RecievedRequest() {
             </div>
             <div className="flex items-center">
                 <button className="ml-5 p-1 bg-green-700 text-white rounded-lg" onClick={()=>handleAccept(request.id)}><Tick/></button>
-                <button className="ml-5 p-1 bg-red-700 text-white rounded-lg"><Cross/></button>           
+                <button className="ml-5 p-1 bg-red-700 text-white rounded-lg" onClick={()=>handleReject(request.id)}><Cross/></button>           
             </div>
           </div>
         ))

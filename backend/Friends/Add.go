@@ -50,7 +50,6 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 	var exists bool
 	err = DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE username=?)", username.Username).Scan(&exists)
 	if err != nil {
-		fmt.Println("Error checking if user exists:", err)
 		http.Error(w, "Failed to check if user exists", http.StatusInternalServerError)
 		return
 	}
@@ -65,7 +64,6 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 			http.Error(w, "Friend request already exists", http.StatusConflict)
 			return
 		}
-		fmt.Println("Error inserting friend request:", err)
 		http.Error(w, "Failed to insert friend request", http.StatusInternalServerError)
 		return
 	}
@@ -80,7 +78,6 @@ func AcceptRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
-		fmt.Println("Error reading request body:", err)
 		http.Error(w, "Failed to read request body", http.StatusBadRequest)
 		return
 	}
@@ -89,13 +86,11 @@ func AcceptRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 	}
 	err = json.Unmarshal(data, &id)
 	if err != nil {
-		fmt.Println("Error reading request body:", err)
 		http.Error(w, "Failed to unmarshal request body", http.StatusBadRequest)
 		return
 	}
 	_, err = DB.Exec("UPDATE friends SET status = 'accepted' WHERE id=?", id.ID)
 	if err != nil {
-		fmt.Println("Error checking if user exists:", err)
 		http.Error(w, "Failed to check if user exists", http.StatusInternalServerError)
 		return
 	}
