@@ -1,4 +1,4 @@
-import { useState } from "react"
+import {  useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 export default function Signup() {
@@ -6,6 +6,7 @@ export default function Signup() {
  const [username, setUsername] = useState<string>("")
  const [password, setPassword] = useState<string>("")
  const navigate = useNavigate()
+
  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (username.length > 15) {

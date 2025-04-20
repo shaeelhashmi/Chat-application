@@ -48,7 +48,9 @@ function AppRoutes() {
   const fetchUser = async () => {
     try {
       await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
-      navigate("/chat");
+      if (window.location.href === 'http://localhost:5173/auth/login' || window.location.href === 'http://localhost:5173/auth/signup') {
+        navigate("/chat");
+      }
     } catch (error) {
       if (window.location.href !== 'http://localhost:5173/auth/login' && window.location.href !== 'http://localhost:5173/auth/signup') {
         navigate("/auth/login");
@@ -78,7 +80,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path='/auth/login' element={<Login  />} />
-      <Route path='/auth/signup' element={<Signup  />} />
+      <Route path='/auth/signup' element={<Signup />} />
       
       <Route path='/requests/sent' element={
       <>

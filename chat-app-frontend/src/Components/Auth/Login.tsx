@@ -5,7 +5,6 @@ import { useDispatch } from "react-redux"
 import { setUsername } from "../Slice/UserName"
 export default function Login() {
   const dispatch = useDispatch()
-
 const [error, setError] = useState<string>("")
 const [user, setUser] = useState<string>("")
 const [password, setPassword] = useState<string>("")
