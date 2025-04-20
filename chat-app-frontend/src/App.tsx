@@ -43,6 +43,19 @@ function AppRoutes() {
         console.error("Error fetching user:", error);
     }
   };
+  const navigate = useNavigate();
+
+  const fetchUser = async () => {
+    try {
+      await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
+      navigate("/chat");
+    } catch (error) {
+      if (window.location.href !== 'http://localhost:5173/auth/login' && window.location.href !== 'http://localhost:5173/auth/signup') {
+        navigate("/auth/login");
+      }
+    
+    }
+  };
   useEffect(() => {
       
     
@@ -57,25 +70,15 @@ function AppRoutes() {
       fetchUserName();
       fetchusers();
       fetchFriends();
-  }, []);
-  useEffect(() => {
-    console.log("Friends updated:", friends);
-  }, [friends]);
-  const navigate = useNavigate();
+      fetchUser();
 
-  const fetchUser = async () => {
-    try {
-      await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
-      navigate("/chat");
-    } catch (error) {
-      console.error("Error fetching user:", error);
-    }
-  };
+  }, []);
+
 
   return (
     <Routes>
-      <Route path='/auth/login' element={<Login func={fetchUser} />} />
-      <Route path='/auth/signup' element={<Signup func={fetchUser} />} />
+      <Route path='/auth/login' element={<Login  />} />
+      <Route path='/auth/signup' element={<Signup  />} />
       
       <Route path='/requests/sent' element={
       <>

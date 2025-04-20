@@ -1,12 +1,11 @@
 import { useState } from "react"
 import axios from "axios"
-import { useNavigate } from "react-router-dom"
-import { useEffect } from "react"
+
 import { useDispatch } from "react-redux"
 import { setUsername } from "../Slice/UserName"
-export default function Login(props:any) {
+export default function Login() {
   const dispatch = useDispatch()
-const navigate = useNavigate()
+
 const [error, setError] = useState<string>("")
 const [user, setUser] = useState<string>("")
 const [password, setPassword] = useState<string>("")
@@ -35,16 +34,13 @@ const handleSubmit =async  (e: React.FormEvent<HTMLFormElement>) => {
   ,{withCredentials: true})
     setError(res.data.message)
    dispatch(setUsername(res.data.user))
-   navigate("/chat")
+   window.location.href = "/chat"
     return 
 }catch(err:any) {
     setError(err.response.data ? err.response.data : "An error occurred")
 }
 
 }
-useEffect(() => {
-  props.func()
-},[])
 
   return (
     <div className="flex items-center justify-center h-screen m-0">

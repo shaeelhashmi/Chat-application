@@ -1,10 +1,11 @@
 import { useState } from "react"
 import axios from "axios"
-import { useEffect } from "react"
-export default function Signup(props:any) {
+import { useNavigate } from "react-router-dom"
+export default function Signup() {
  const [error, setError] = useState<string>("")
  const [username, setUsername] = useState<string>("")
  const [password, setPassword] = useState<string>("")
+ const navigate = useNavigate()
  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (username.length > 15) {
@@ -27,17 +28,15 @@ export default function Signup(props:any) {
             username: username,
             password: password
         }, { withCredentials: true })
-        console.log(res.data)
         setError(res.data.message)
+        navigate("/auth/login")
         return 
     } catch (err: any) {
         console.log(err.response.data)
         setError(err.response.data)
     }
  }
- useEffect(() => {
-   props.func()
- },[])
+
   return (
     <div className="flex items-center justify-center h-screen m-0">
     <form action="" className="p-3 h-[400px] w-[350px] bg-white border-2 border-solid shadow-lg text-md" onSubmit={handleSubmit} >
