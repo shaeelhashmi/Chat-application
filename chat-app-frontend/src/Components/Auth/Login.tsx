@@ -38,7 +38,7 @@ const handleSubmit =async  (e: React.FormEvent<HTMLFormElement>) => {
    navigate("/chat")
     return 
 }catch(err:any) {
-    setError(err.response.data)
+    setError(err.response.data ? err.response.data : "An error occurred")
 }
 
 }

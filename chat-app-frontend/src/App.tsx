@@ -23,8 +23,18 @@ function App() {
 // Move fetchUser inside a component inside <Router>
 function AppRoutes() {
   const [users, setUsers] = useState<string[]>([]);
+  const [friends,setFriends] = useState<string[]>([]);
 
   const dispatch = useDispatch()
+  const fetchFriends = async () => {
+    try {
+        const response = await axios.get("http://localhost:8080/api/friends", { withCredentials: true });
+        setFriends(response.data);
+    } catch (error) {
+        console.error("Error fetching friends:", error);
+    }
+  }
+
   const fetchUserName = async () => {
     try {
         const response = await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
@@ -46,8 +56,11 @@ function AppRoutes() {
       }
       fetchUserName();
       fetchusers();
+      fetchFriends();
   }, []);
-  
+  useEffect(() => {
+    console.log("Friends updated:", friends);
+  }, [friends]);
   const navigate = useNavigate();
 
   const fetchUser = async () => {
@@ -79,7 +92,7 @@ function AppRoutes() {
       <>
       <Navbar users={users}/>     
       <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
-      <ChatSideBar users={users}/>
+      <ChatSideBar users={friends}/>
       <MessageBody  ></MessageBody>
       </div>
        </>} />
@@ -87,7 +100,7 @@ function AppRoutes() {
       <>
       <Navbar users={users}/>     
       <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
-      <ChatSideBar users={users}/>
+      <ChatSideBar users={friends}/>
       <HomePage  ></HomePage>
       </div>
        </>} />
@@ -95,7 +108,7 @@ function AppRoutes() {
       <>
       <Navbar users={users}/>     
       <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
-      <ChatSideBar users={users}/>
+      <ChatSideBar users={friends}/>
       <RecievedRequest  ></RecievedRequest>
       </div>
        </>} />

@@ -54,6 +54,9 @@ func main() {
 	http.HandleFunc("/acceptrequest", func(w http.ResponseWriter, r *http.Request) {
 		friends.AcceptRequests(w, r, DB)
 	})
+	http.HandleFunc("/api/friends", func(w http.ResponseWriter, r *http.Request) {
+		apis.Friends(w, r, DB, store)
+	})
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)
 }

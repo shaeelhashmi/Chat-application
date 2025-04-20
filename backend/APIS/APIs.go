@@ -10,6 +10,47 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
+	User, err := store.Get(r, "Login-session")
+	fmt.Println("Request User:", User.Values["username"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	rows, err := DB.Query("SELECT sender FROM friends WHERE receiver = ? AND status = ?", User.Values["username"], "accepted")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var friendList []string
+	for rows.Next() {
+		var friend string
+		if err := rows.Scan(&friend); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		friendList = append(friendList, friend)
+	}
+	rows, err = DB.Query("SELECT receiver FROM friends WHERE sender = ? AND status = ?", User.Values["username"], "accepted")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var friend string
+		if err := rows.Scan(&friend); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		friendList = append(friendList, friend)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(friendList)
+
+}
 func ImportUsers(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
 
 	loginUser, err := store.Get(r, "Login-session")
