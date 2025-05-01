@@ -200,6 +200,7 @@ func IsloggedIn(w http.ResponseWriter, r *http.Request, store *sessions.CookieSt
 		"user":    session.Values["username"].(string),
 		"session": sessionID,
 	}
+	fmt.Println(response)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }

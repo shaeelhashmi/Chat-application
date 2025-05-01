@@ -12,6 +12,9 @@ import MessageBody from '../Components/MainPage/MessageBody';
 import HomePage from '../Components/MainPage/HomePage';
 import RecievedRequest from '../Components/Requests/RecievedRequest';
 import Settings from '../Components/Settings.tsx/Settings';
+import ChangeUserName from '../Components/Settings.tsx/ChangeUserName';
+import ChangePassword from '../Components/Settings.tsx/ChangePassword';
+import SettingSideBar from '../Components/Settings.tsx/SideBar/SettingSideBar';
 export default function AppRoutes() {
     const [users, setUsers] = useState<string[]>([]);
     const [friends,setFriends] = useState<string[]>([]);
@@ -43,6 +46,7 @@ export default function AppRoutes() {
           navigate("/chat");
         }
       } catch (error) {
+        console.log("Error fetching user:", error);
         if (window.location.href !== 'http://localhost:5173/auth/login' && window.location.href !== 'http://localhost:5173/auth/signup') {
           navigate("/auth/login");
         }
@@ -87,7 +91,29 @@ export default function AppRoutes() {
       <Route path='/settings' element={
         <>
               <Navbar users={users}/>   
-        <Settings />
+              <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+              <SettingSideBar />
+              <Settings />
+              </div>
+        </>
+        } />
+           <Route path='/settings/user' element={
+        <>
+              <Navbar users={users}/>   
+              
+              <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+              <SettingSideBar />
+              <ChangeUserName />
+              </div>
+        </>
+        } />
+            <Route path='/settings/password' element={
+        <>
+              <Navbar users={users}/>   
+              <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+              <SettingSideBar />
+              <ChangePassword />
+              </div>
         </>
         } />
       <Route path='/chat/:id' element={

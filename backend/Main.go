@@ -6,6 +6,7 @@ import (
 	configurations "chat-app-backend/Configurations"
 	friends "chat-app-backend/Friends"
 	delete "chat-app-backend/Friends/DeleteRequests"
+	"chat-app-backend/Settings"
 	"chat-app-backend/Socket"
 	"net/http"
 
@@ -64,6 +65,9 @@ func main() {
 	})
 	http.HandleFunc("/delete/sentrequest", func(w http.ResponseWriter, r *http.Request) {
 		delete.DeleteSentRequest(w, r, DB, store)
+	})
+	http.HandleFunc("/settings/username", func(w http.ResponseWriter, r *http.Request) {
+		Settings.ChangeUserName(w, r, DB, store)
 	})
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)

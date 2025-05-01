@@ -23,7 +23,7 @@ type MessageResponse struct {
 	Time     string `json:"created_at"`
 }
 
-var connections = make(map[string]*websocket.Conn)
+var Connections = make(map[string]*websocket.Conn)
 var mu sync.Mutex
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
@@ -31,7 +31,7 @@ var upgrader = websocket.Upgrader{
 
 func SendMessage(receiver string, msg []byte) {
 	mu.Lock()
-	conn, exists := connections[receiver]
+	conn, exists := Connections[receiver]
 	mu.Unlock()
 
 	if exists {
@@ -41,11 +41,11 @@ func SendMessage(receiver string, msg []byte) {
 		if err != nil {
 			fmt.Println("Error sending message:", err)
 			mu.Lock()
-			delete(connections, receiver) // Remove disconnected clients
+			delete(Connections, receiver) // Remove disconnected clients
 			mu.Unlock()
 		}
 	} else {
-		fmt.Println("Receiver not found in connections:", receiver)
+		fmt.Println("Receiver not found in Connections:", receiver)
 	}
 }
 
@@ -56,7 +56,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 		return
 	}
 	defer tx.Rollback()
-	_, err = DB.Exec("CREATE TABLE IF NOT EXISTS messsages (id INT AUTO_INCREMENT PRIMARY KEY, sender VARCHAR(255), reciever VARCHAR(255), message TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
+	_, err = DB.Exec("CREATE TABLE IF NOT EXISTS messages (id INT AUTO_INCREMENT PRIMARY KEY, sender VARCHAR(255), reciever VARCHAR(255), message TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
 	if err != nil {
 		http.Error(w, "Failed to prepare statement", http.StatusInternalServerError)
 		return
@@ -70,7 +70,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 
 	mu.Lock()
 
-	fmt.Println("Active Connections:", connections) // Debugging line
+	fmt.Println("Active Connections:", Connections) // Debugging line
 	mu.Unlock()
 
 	var sender string
@@ -88,13 +88,13 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 		sender = messageData.Sender
 		receiver := messageData.Reciever
 		msg1 := messageData.Message
-		connections[sender] = conn
+		Connections[sender] = conn
 		fmt.Println("Message received from", sender, ":", string(msg1))
 		if receiver == "" {
 			fmt.Println("Receiver is empty, skipping message")
 			continue
 		}
-		stmt, err := DB.Prepare("INSERT INTO messsages (sender, reciever, message) VALUES (?, ?, ?)")
+		stmt, err := DB.Prepare("INSERT INTO messages (sender, receiver, message) VALUES (?, ?, ?)")
 		if err != nil {
 			fmt.Println("Error inserting message into database:", err)
 			errMsg := fmt.Sprintf("Failed to insert message into database: %v", err)
@@ -103,7 +103,25 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			return
 		}
 		defer stmt.Close()
-		_, err = stmt.Exec(sender, receiver, msg1)
+		var SenderID int
+		err = DB.QueryRow("SELECT id FROM users WHERE username = ?", sender).Scan(&SenderID)
+		if err != nil {
+			fmt.Println("Error fetching sender ID:", err)
+			errMsg := fmt.Sprintf("Failed to fetch sender ID: %v", err)
+			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
+			conn.Close()
+			return
+		}
+		var ReceiverID int
+		err = DB.QueryRow("SELECT id FROM users WHERE username = ?", receiver).Scan(&ReceiverID)
+		if err != nil {
+			fmt.Println("Error fetching receiver ID:", err)
+			errMsg := fmt.Sprintf("Failed to fetch receiver ID: %v", err)
+			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
+			conn.Close()
+			return
+		}
+		_, err = stmt.Exec(SenderID, ReceiverID, msg1)
 		if err != nil {
 			fmt.Println("Error executing statement:", err)
 			errMsg := fmt.Sprintf("Failed to execute statement: %v", err)
@@ -126,6 +144,6 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 	}
 
 	mu.Lock()
-	delete(connections, sender)
+	delete(Connections, sender)
 	mu.Unlock()
 }
