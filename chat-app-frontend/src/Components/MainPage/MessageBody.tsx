@@ -20,7 +20,6 @@ const socketRef = useRef<WebSocket | null>(null);
 const recieveMessages= async ()=>{
   try {
   const response=await axios.get(`http://localhost:8080/api/messages?reciever=${reciever}`,{withCredentials:true})
-  console.log(response.data)
   setMessagesList(response.data);
   }
   catch (error) {
@@ -46,10 +45,13 @@ const formConnection = async () => {
         });
     
         socket.addEventListener("message", (event) => {
-            console.log("Message received:", event.data);
-            console.log(event.data.data)
+            
+            
             let parsedData = JSON.parse(event.data)
-  
+            console.log(parsedData)
+            new Notification('Hello from your React app!', {
+              body: `Message from ${parsedData.sender}: ${parsedData.message}`,
+            });
             setMessagesList(prevMessages => [...(prevMessages || []), parsedData]);
         });
     
@@ -75,7 +77,9 @@ const formConnection = async () => {
             }
         };
         }  
-       
+      useEffect(() => {
+   
+      }, [MessagesList]); 
 useEffect(() => { 
   console.log(params.id);
    (async () => {
