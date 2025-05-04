@@ -57,8 +57,6 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 		http.Error(w, "User does not exist", http.StatusNotFound)
 		return
 	}
-	fmt.Println("User: ", user)
-	fmt.Println("Friend: ", username.Username)
 	var userId int
 	err = DB.QueryRow("SELECT id FROM users WHERE username=?", user).Scan(&userId)
 	if err != nil {
@@ -73,6 +71,15 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 	}
 
 	err = DB.QueryRow("SELECT EXISTS(SELECT 1 FROM friends WHERE sender=? AND receiver=?)", userId, friendId).Scan(&exists)
+	if err != nil {
+		http.Error(w, "Failed to check if friend request exists", http.StatusInternalServerError)
+		return
+	}
+	if exists {
+		http.Error(w, "Friend request already exists", http.StatusConflict)
+		return
+	}
+	err = DB.QueryRow("SELECT EXISTS(SELECT 1 FROM friends WHERE sender=? AND receiver=?)", friendId, userId).Scan(&exists)
 	if err != nil {
 		http.Error(w, "Failed to check if friend request exists", http.StatusInternalServerError)
 		return

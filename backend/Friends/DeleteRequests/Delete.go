@@ -33,7 +33,14 @@ func DeleteReceivedRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, s
 		http.Error(w, "Failed to scan request", http.StatusInternalServerError)
 		return
 	}
-	if receiver != session.Values["username"] {
+	var recieverId string
+	err = DB.QueryRow("SELECT id FROM users WHERE username=?", session.Values["username"]).Scan(&recieverId)
+	if err != nil {
+		http.Error(w, "Failed to get user ID", http.StatusInternalServerError)
+		return
+	}
+
+	if receiver != recieverId {
 		http.Error(w, "No such friend request", http.StatusNotFound)
 		return
 	}
