@@ -69,6 +69,9 @@ func main() {
 	http.HandleFunc("/settings/username", func(w http.ResponseWriter, r *http.Request) {
 		Settings.ChangeUserName(w, r, DB, store)
 	})
+	http.HandleFunc("/settings/password", func(w http.ResponseWriter, r *http.Request) {
+		Settings.ChangePassword(w, r, DB, store)
+	})
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)
 }

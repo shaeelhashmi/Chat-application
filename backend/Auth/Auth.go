@@ -136,7 +136,7 @@ func SignUp(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 		tx.Rollback()
 		return
 	}
-	salt := generateRandomSalt(16)
+	salt := GenerateRandomSalt(16)
 	hashedPassword := HashPassword(user.Password, salt)
 	_, err = tx.Exec("INSERT INTO users (username, password, salt) VALUES (?, ?, ?)", user.Username, hashedPassword, salt)
 	if err != nil {
@@ -167,7 +167,7 @@ func HashPassword(password string, salt []byte) string {
 	return hashedPasswordHex
 }
 
-func generateRandomSalt(saltSize int) []byte {
+func GenerateRandomSalt(saltSize int) []byte {
 	var salt = make([]byte, saltSize)
 	_, err := rand.Read(salt[:])
 	if err != nil {

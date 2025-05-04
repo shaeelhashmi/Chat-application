@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 
+	"chat-app-backend/Auth"
 	"chat-app-backend/Socket"
 
 	"github.com/gorilla/sessions"
@@ -95,7 +96,9 @@ func ChangePassword(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 		http.Error(w, "User not logged in", http.StatusUnauthorized)
 		return
 	}
-	err = DB.QueryRow("UPDATE users SET password=? WHERE username=?", passwords, user).Err()
+	salt := Auth.GenerateRandomSalt(16)
+	passwords = Auth.HashPassword(passwords, salt)
+	err = DB.QueryRow("UPDATE users SET password=?, salt=? WHERE username=?", passwords, salt, user).Err()
 	if err != nil {
 		http.Error(w, "Failed to update password", http.StatusInternalServerError)
 		return
