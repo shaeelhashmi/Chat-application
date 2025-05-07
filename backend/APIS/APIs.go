@@ -24,7 +24,7 @@ func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	rows, err := DB.Query("SELECT sender FROM friends WHERE receiver = ? AND status = ?", recieverId, "accepted")
+	rows, err := DB.Query("SELECT Friend1 FROM friends WHERE Friend2 = ? ", recieverId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -46,7 +46,7 @@ func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions
 		}
 		friendList = append(friendList, friendName)
 	}
-	rows, err = DB.Query("SELECT receiver FROM friends WHERE sender = ? AND status = ?", recieverId, "accepted")
+	rows, err = DB.Query("SELECT Friend2 FROM friends WHERE Friend1 = ?", recieverId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -197,7 +197,7 @@ func SentRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *ses
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	rows, err := DB.Query("SELECT id,receiver, created_at FROM friends WHERE sender = ? AND status=?", senderId, "pending")
+	rows, err := DB.Query("SELECT id,receiver, created_at FROM requests WHERE sender = ? AND status=?", senderId, "pending")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -252,7 +252,7 @@ func RecievedRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	rows, err := DB.Query("SELECT id,sender, created_at FROM friends WHERE receiver = ? AND status=?", recieverId, "pending")
+	rows, err := DB.Query("SELECT id,sender, created_at FROM requests WHERE receiver = ? AND status=?", recieverId, "pending")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

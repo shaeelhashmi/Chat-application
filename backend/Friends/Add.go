@@ -1,4 +1,4 @@
-package friends
+package requests
 
 import (
 	"database/sql"
@@ -70,7 +70,7 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 		return
 	}
 
-	err = DB.QueryRow("SELECT EXISTS(SELECT 1 FROM friends WHERE sender=? AND receiver=?)", userId, friendId).Scan(&exists)
+	err = DB.QueryRow("SELECT EXISTS(SELECT 1 FROM requests WHERE sender=? AND receiver=?)", userId, friendId).Scan(&exists)
 	if err != nil {
 		http.Error(w, "Failed to check if friend request exists", http.StatusInternalServerError)
 		return
@@ -79,7 +79,7 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 		http.Error(w, "Friend request already exists", http.StatusConflict)
 		return
 	}
-	err = DB.QueryRow("SELECT EXISTS(SELECT 1 FROM friends WHERE sender=? AND receiver=?)", friendId, userId).Scan(&exists)
+	err = DB.QueryRow("SELECT EXISTS(SELECT 1 FROM requests WHERE sender=? AND receiver=?)", friendId, userId).Scan(&exists)
 	if err != nil {
 		http.Error(w, "Failed to check if friend request exists", http.StatusInternalServerError)
 		return
@@ -88,7 +88,7 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 		http.Error(w, "Friend request already exists", http.StatusConflict)
 		return
 	}
-	_, err = tx.Exec("INSERT INTO friends (sender, receiver) VALUES (?, ?)", userId, friendId)
+	_, err = tx.Exec("INSERT INTO requests (sender, receiver) VALUES (?, ?)", userId, friendId)
 	if err != nil {
 		if mysqlErr, ok := err.(*mysql.MySQLError); ok && mysqlErr.Number == 1062 {
 			http.Error(w, "Friend request already exists", http.StatusConflict)
@@ -111,6 +111,13 @@ func AcceptRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 		http.Error(w, "Failed to read request body", http.StatusBadRequest)
 		return
 	}
+	tx, err := DB.Begin()
+	if err != nil {
+		fmt.Println("Error beginning transaction:", err)
+		http.Error(w, "Failed to begin transaction", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback()
 	var id struct {
 		ID int
 	}
@@ -119,9 +126,33 @@ func AcceptRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 		http.Error(w, "Failed to unmarshal request body", http.StatusBadRequest)
 		return
 	}
-	_, err = DB.Exec("UPDATE friends SET status = 'accepted' WHERE id=?", id.ID)
+	_, err = tx.Exec("UPDATE requests SET status = 'accepted' WHERE id=?", id.ID)
 	if err != nil {
+		fmt.Println("Error beginning transaction:", err)
+		tx.Rollback()
 		http.Error(w, "Failed to check if user exists", http.StatusInternalServerError)
+		return
+	}
+	var receiverID, senderID int
+
+	err = DB.QueryRow("SELECT sender, receiver FROM requests WHERE id=?", id.ID).Scan(&senderID, &receiverID)
+	if err != nil {
+		fmt.Println("Error beginning transaction:", err)
+		http.Error(w, "Failed to get user ID", http.StatusInternalServerError)
+		tx.Rollback()
+		return
+	}
+	_, err = tx.Exec("INSERT INTO friends (Friend1, Friend2) VALUES (?, ?)", senderID, receiverID)
+	if err != nil {
+		tx.Rollback()
+		fmt.Println("Error beginning transaction:", err)
+		http.Error(w, "Failed to insert friend request", http.StatusInternalServerError)
+		return
+	}
+	err = tx.Commit()
+	if err != nil {
+		fmt.Println("Error beginning transaction:", err)
+		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
