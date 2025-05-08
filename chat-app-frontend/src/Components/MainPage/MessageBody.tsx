@@ -113,7 +113,8 @@ const sendMessage = () => {
 
   return (
   < >
-    <div className=" h-full   mt-20 p-2 ml-[3%]">
+   
+    <div className=" h-full   mt-14 p-2 ml-[3%] w-full">
       {MessagesList?.map((message, index) => (
         <div key={index} className={`flex  mt-4 ${message.sender==user?"justify-end":""}`}>
           <div className={`bg-[#141474] text-white p-4 rounded-lg w-[50%] `}>

@@ -1,6 +1,6 @@
 
 interface ChatSideBarProps {
-    users: string[];
+    users: any[];
 }
 
 export default function ChatSideBar(props: ChatSideBarProps) {
@@ -13,8 +13,14 @@ export default function ChatSideBar(props: ChatSideBarProps) {
         <div className="mt-16">
       {props.users?.map((user, index) => (
         <div key={index} className="flex items-center cursor-pointer ">
-          <a className="text-white p-4 w-[100%] hover:bg-[#141474] text-start border-[#141474] border-b-2  transition-all duration-500" href={`/chat/${user}`}>{user}</a>
+          <a className="text-white p-4 w-[100%] hover:bg-[#141474] text-start border-[#141474] border-b-2  transition-all duration-500" href={`/chat/${user.friend}`}>{user.friend}</a>
+       
+            <button className=" transition-all duration-500 flex items-center justify-center  text-white rounded-md bg-[#4242ab] p-1 hover:bg-[#32328b] " >
+              Options
+            </button>
+
         </div>
+     
       ))}
       </div>
     

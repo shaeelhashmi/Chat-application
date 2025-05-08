@@ -10,6 +10,11 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+type friends struct {
+	Friends string `json:"friend"`
+	Id      int    `json:"id"`
+}
+
 func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
 	User, err := store.Get(r, "Login-session")
 	fmt.Println("Request User:", User.Values["username"])
@@ -24,17 +29,18 @@ func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	rows, err := DB.Query("SELECT Friend1 FROM friends WHERE Friend2 = ? ", recieverId)
+	rows, err := DB.Query("SELECT id,Friend1 FROM friends WHERE Friend2 = ? ", recieverId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
-	var friendList []string
+	var friendList []friends
 	for rows.Next() {
 		var friend int
-		if err := rows.Scan(&friend); err != nil {
+		var friendId int
+		if err := rows.Scan(&friendId, &friend); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -44,7 +50,7 @@ func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		friendList = append(friendList, friendName)
+		friendList = append(friendList, friends{friendName, friendId})
 	}
 	rows, err = DB.Query("SELECT Friend2 FROM friends WHERE Friend1 = ?", recieverId)
 	if err != nil {
@@ -54,7 +60,8 @@ func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions
 	defer rows.Close()
 	for rows.Next() {
 		var friend int
-		if err := rows.Scan(&friend); err != nil {
+		var friendId int
+		if err := rows.Scan(&friendId, &friend); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -64,8 +71,9 @@ func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		friendList = append(friendList, friendName)
+		friendList = append(friendList, friends{friendName, friendId})
 	}
+	fmt.Print(friendList)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(friendList)
 

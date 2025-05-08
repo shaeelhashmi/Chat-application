@@ -17,7 +17,7 @@ import ChangePassword from '../Components/Settings.tsx/ChangePassword';
 import SettingSideBar from '../Components/Settings.tsx/SideBar/SettingSideBar';
 export default function AppRoutes() {
     const [users, setUsers] = useState<string[]>([]);
-    const [friends,setFriends] = useState<string[]>([]);
+    const [friends,setFriends] = useState<any[]>([]);
   
     const dispatch = useDispatch()
     const fetchFriends = async () => {
@@ -46,7 +46,6 @@ export default function AppRoutes() {
           navigate("/chat");
         }
       } catch (error) {
-        console.log("Error fetching user:", error);
         if (window.location.href !== 'http://localhost:5173/auth/login' && window.location.href !== 'http://localhost:5173/auth/signup') {
           navigate("/auth/login");
         }
