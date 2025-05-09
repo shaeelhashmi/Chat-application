@@ -15,6 +15,7 @@ import Settings from '../Components/Settings.tsx/Settings';
 import ChangeUserName from '../Components/Settings.tsx/ChangeUserName';
 import ChangePassword from '../Components/Settings.tsx/ChangePassword';
 import SettingSideBar from '../Components/Settings.tsx/SideBar/SettingSideBar';
+import FriendSetting from '../Components/Friends/FriendSetting';
 export default function AppRoutes() {
     const [users, setUsers] = useState<string[]>([]);
     const [friends,setFriends] = useState<any[]>([]);
@@ -139,6 +140,12 @@ export default function AppRoutes() {
         <RecievedRequest  ></RecievedRequest>
         </div>
          </>} />
+         <Route path="/friend/:id/:name" element={
+        <>
+        <Navbar users={users}/>
+        <FriendSetting />
+        </>} />
+
       </Routes>
     );
 }

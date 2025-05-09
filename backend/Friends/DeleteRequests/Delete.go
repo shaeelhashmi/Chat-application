@@ -1,6 +1,7 @@
 package delete
 
 import (
+	utils "chat-app-backend/Utils"
 	"database/sql"
 	"net/http"
 
@@ -13,8 +14,7 @@ func DeleteReceivedRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, s
 		return
 	}
 	session, err := store.Get(r, "Login-session")
-	if err != nil {
-		http.Error(w, "Failed to get session", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to get session", http.StatusInternalServerError) {
 		return
 	}
 	if session.Values["username"] == nil {
@@ -29,14 +29,12 @@ func DeleteReceivedRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, s
 	}
 	var receiver string
 	err = check.Scan(&receiver)
-	if err != nil {
-		http.Error(w, "Failed to scan request", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to scan request", http.StatusInternalServerError) {
 		return
 	}
 	var recieverId string
 	err = DB.QueryRow("SELECT id FROM users WHERE username=?", session.Values["username"]).Scan(&recieverId)
-	if err != nil {
-		http.Error(w, "Failed to get user ID", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to get user ID", http.StatusInternalServerError) {
 		return
 	}
 
@@ -45,8 +43,7 @@ func DeleteReceivedRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, s
 		return
 	}
 	_, err = DB.Exec("DELETE FROM friends WHERE id=? AND status=?", id, "pending")
-	if err != nil {
-		http.Error(w, "Failed to delete friend request", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to delete friend request", http.StatusInternalServerError) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -59,8 +56,7 @@ func DeleteSentRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 		return
 	}
 	session, err := store.Get(r, "Login-session")
-	if err != nil {
-		http.Error(w, "Failed to get session", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to get session", http.StatusInternalServerError) {
 		return
 	}
 	if session.Values["username"] == nil {
@@ -75,8 +71,7 @@ func DeleteSentRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 	}
 	var sender string
 	err = check.Scan(&sender)
-	if err != nil {
-		http.Error(w, "Failed to scan request", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to scan request", http.StatusInternalServerError) {
 		return
 	}
 	if sender != session.Values["username"] {
@@ -84,8 +79,7 @@ func DeleteSentRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 		return
 	}
 	_, err = DB.Exec("DELETE FROM friends WHERE id=? AND status=?", id, "pending")
-	if err != nil {
-		http.Error(w, "Failed to delete friend request", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to delete friend request", http.StatusInternalServerError) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)

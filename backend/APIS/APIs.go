@@ -1,6 +1,7 @@
 package apis
 
 import (
+	utils "chat-app-backend/Utils"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -18,20 +19,21 @@ type friends struct {
 func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
 	User, err := store.Get(r, "Login-session")
 	fmt.Println("Request User:", User.Values["username"])
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
+		return
+	}
+	if User.Values["username"] == nil {
+		http.Error(w, "User not logged in", http.StatusUnauthorized)
 		return
 	}
 	name := User.Values["username"]
 	var recieverId int
 	err = DB.QueryRow("SELECT id FROM users WHERE username = ?", name).Scan(&recieverId)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 		return
 	}
 	rows, err := DB.Query("SELECT id,Friend1 FROM friends WHERE Friend2 = ? ", recieverId)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 		return
 	}
 	defer rows.Close()
@@ -40,40 +42,34 @@ func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions
 	for rows.Next() {
 		var friend int
 		var friendId int
-		if err := rows.Scan(&friendId, &friend); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err := rows.Scan(&friendId, &friend); utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		var friendName string
 		err = DB.QueryRow("SELECT username FROM users WHERE id = ?", friend).Scan(&friendName)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		friendList = append(friendList, friends{friendName, friendId})
 	}
 	rows, err = DB.Query("SELECT Friend2 FROM friends WHERE Friend1 = ?", recieverId)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 		return
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var friend int
 		var friendId int
-		if err := rows.Scan(&friendId, &friend); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err := rows.Scan(&friendId, &friend); utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		var friendName string
 		err = DB.QueryRow("SELECT username FROM users WHERE id = ?", friend).Scan(&friendName)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		friendList = append(friendList, friends{friendName, friendId})
 	}
-	fmt.Print(friendList)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(friendList)
 
@@ -81,13 +77,15 @@ func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions
 func ImportUsers(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
 
 	loginUser, err := store.Get(r, "Login-session")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, "User not logged in", http.StatusUnauthorized) {
+		return
+	}
+	if loginUser.Values["username"] == nil {
+		http.Error(w, "User not logged in", http.StatusUnauthorized)
 		return
 	}
 	users, err := DB.Query("SELECT username FROM users WHERE username != ?", loginUser.Values["username"])
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 		return
 	}
 
@@ -96,7 +94,7 @@ func ImportUsers(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sess
 	var usernames []string
 	for users.Next() {
 		var username string
-		if err := users.Scan(&username); err != nil {
+		if err := users.Scan(&username); utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -110,8 +108,7 @@ func ImportUsers(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sess
 
 func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
 	User, err := store.Get(r, "Login-session")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 		return
 	}
 	reciever := r.URL.Query().Get("reciever")
@@ -127,22 +124,17 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 	}
 	var recieverId int
 	err = DB.QueryRow("SELECT id FROM users WHERE username = ?", reciever).Scan(&recieverId)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 		return
 	}
 	var senderId int
 	err = DB.QueryRow("SELECT id FROM users WHERE username = ?", User.Values["username"]).Scan(&senderId)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 		return
 	}
 
 	rows, err := DB.Query("SELECT sender, receiver, message, created_at FROM messages WHERE (sender = ? AND receiver = ?) OR (receiver = ? AND sender = ?)", senderId, recieverId, senderId, recieverId)
-	fmt.Println(rows)
-	if err != nil {
-		fmt.Println("Error fetching messages:", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 		return
 	}
 	defer rows.Close()
@@ -156,27 +148,19 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 		}
 		var createdAt string
 		var senderId, recieverId int
-		if err := rows.Scan(&senderId, &recieverId, &msg.Message, &createdAt); err != nil {
-			fmt.Println("Error scanning message:", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err := rows.Scan(&senderId, &recieverId, &msg.Message, &createdAt); utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		msg.CreatedAt, err = time.Parse("2006-01-02 15:04:05", createdAt)
-		if err != nil {
-			fmt.Println("Error parsing created_at:", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		err = DB.QueryRow("SELECT username FROM users WHERE id = ?", senderId).Scan(&msg.Sender)
-		if err != nil {
-			fmt.Println("Error fetching sender username:", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		err = DB.QueryRow("SELECT username FROM users WHERE id = ?", recieverId).Scan(&msg.Reciever)
-		if err != nil {
-			fmt.Println("Error fetching reciever username:", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 
@@ -189,8 +173,7 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 
 func SentRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
 	User, err := store.Get(r, "Login-session")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 		return
 	}
 	var sentRequests []struct {
@@ -201,13 +184,12 @@ func SentRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *ses
 	name := User.Values["username"]
 	var senderId int
 	err = DB.QueryRow("SELECT id FROM users WHERE username = ?", name).Scan(&senderId)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
+
 		return
 	}
 	rows, err := DB.Query("SELECT id,receiver, created_at FROM requests WHERE sender = ? AND status=?", senderId, "pending")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 		return
 	}
 	defer rows.Close()
@@ -220,19 +202,15 @@ func SentRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *ses
 		}
 		var createdAt string
 		var recieverId int
-		if err := rows.Scan(&request.ID, &recieverId, &createdAt); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err := rows.Scan(&request.ID, &recieverId, &createdAt); utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		err = DB.QueryRow("SELECT username FROM users WHERE id = ?", recieverId).Scan(&request.Reciever)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		request.CreatedAt, err = time.Parse("2006-01-02 15:04:05", createdAt)
-		if err != nil {
-
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		sentRequests = append(sentRequests, request)
@@ -261,8 +239,7 @@ func RecievedRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store 
 		return
 	}
 	rows, err := DB.Query("SELECT id,sender, created_at FROM requests WHERE receiver = ? AND status=?", recieverId, "pending")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 		return
 	}
 	defer rows.Close()
@@ -275,18 +252,15 @@ func RecievedRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store 
 		}
 		var createdAt string
 		var senderId int
-		if err := rows.Scan(&request.ID, &senderId, &createdAt); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err := rows.Scan(&request.ID, &senderId, &createdAt); utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		err = DB.QueryRow("SELECT username FROM users WHERE id = ?", senderId).Scan(&request.Sender)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		request.CreatedAt, err = time.Parse("2006-01-02 15:04:05", createdAt)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if utils.HandleError(w, err, err.Error(), http.StatusInternalServerError) {
 			return
 		}
 		recievedRequests = append(recievedRequests, request)

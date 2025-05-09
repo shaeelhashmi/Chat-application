@@ -4,7 +4,7 @@ import (
 	apis "chat-app-backend/APIS"
 	"chat-app-backend/Auth"
 	configurations "chat-app-backend/Configurations"
-	friends "chat-app-backend/Friends"
+	friends "chat-app-backend/Friends/AddFriend"
 	delete "chat-app-backend/Friends/DeleteRequests"
 	"chat-app-backend/Settings"
 	"chat-app-backend/Socket"

@@ -1,6 +1,7 @@
 package Socket
 
 import (
+	utils "chat-app-backend/Utils"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -35,35 +36,18 @@ func SendMessage(receiver string, msg []byte) {
 	mu.Unlock()
 
 	if exists {
-		fmt.Println("Sending message to:", receiver)
-		fmt.Println("Message:", string(msg))
 		err := conn.WriteMessage(websocket.TextMessage, msg)
 		if err != nil {
-			fmt.Println("Error sending message:", err)
 			mu.Lock()
 			delete(Connections, receiver) // Remove disconnected clients
 			mu.Unlock()
 		}
-	} else {
-		fmt.Println("Receiver not found in Connections:", receiver)
 	}
 }
 
 func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
-	tx, err := DB.Begin()
-	if err != nil {
-		http.Error(w, "Failed to begin transaction", http.StatusInternalServerError)
-		return
-	}
-	defer tx.Rollback()
-	_, err = DB.Exec("CREATE TABLE IF NOT EXISTS messages (id INT AUTO_INCREMENT PRIMARY KEY, sender VARCHAR(255), reciever VARCHAR(255), message TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
-	if err != nil {
-		http.Error(w, "Failed to prepare statement", http.StatusInternalServerError)
-		return
-	}
 	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		http.Error(w, "Failed to upgrade connection", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to upgrade transaction", http.StatusInternalServerError) {
 		return
 	}
 	defer conn.Close()

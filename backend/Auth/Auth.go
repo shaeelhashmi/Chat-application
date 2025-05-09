@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"time"
 
+	utils "chat-app-backend/Utils"
+
 	"github.com/gorilla/sessions"
 )
 
@@ -24,7 +26,6 @@ func GenerateSessionID(userName string) string {
 	current_time := time.Now().UnixMilli()
 	sessionID := fmt.Sprintf("%x", current_time)
 	sessionID = userName + sessionID
-	fmt.Println("Session ID:", sessionID)
 	return sessionID
 }
 func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, DB *sql.DB) {
@@ -35,16 +36,17 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, 
 
 	var user User
 	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+	if utils.HandleError(w, err, "Failed to read request body", http.StatusBadRequest) {
 		return
 	}
-	json.Unmarshal(body, &user)
+	err = json.Unmarshal(body, &user)
+	if utils.HandleError(w, err, "Failed to unmarshal request body", http.StatusBadRequest) {
+		return
+	}
 	defer r.Body.Close()
 
 	session, err := store.Get(r, "Login-session")
-	if err != nil {
-		http.Error(w, "Failed to get session", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to get session", http.StatusInternalServerError) {
 		return
 	}
 	var dbUser User
@@ -54,7 +56,8 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, 
 		if err == sql.ErrNoRows {
 			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 		} else {
-			http.Error(w, "Failed to query database", http.StatusInternalServerError)
+			utils.HandleError(w, err, "Failed to query user", http.StatusInternalServerError)
+
 		}
 		return
 	}
@@ -65,31 +68,19 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, 
 	}
 	session.Values["username"] = user.Username
 	tx, err := DB.Begin()
-	if err != nil {
-		http.Error(w, "Failed to begin transaction", http.StatusInternalServerError)
-
+	if utils.HandleError(w, err, "Failed to begin transaction", http.StatusInternalServerError) {
 		return
 	}
 	defer tx.Rollback()
-	_, err = tx.Exec(`CREATE TABLE IF NOT EXISTS sessions (username VARCHAR(15) NOT NULL PRIMARY KEY, sessionID VARCHAR(255) NOT NULL,
-	 EndDate DATETIME DEFAULT (CURRENT_TIMESTAMP + INTERVAL 1 HOUR));`)
-	if err != nil {
-		http.Error(w, "Failed to create sessions table", http.StatusInternalServerError)
-		return
-	}
 	sessionID := GenerateSessionID(user.Username)
 	_, err = tx.Exec("INSERT INTO sessions (username, sessionID) VALUES (?, ?) ON DUPLICATE KEY UPDATE sessionID = VALUES(sessionID)", user.Username, sessionID)
-	if err != nil {
-		fmt.Print("Error inserting session:", err)
-		http.Error(w, "Failed to insert session", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to insert session", http.StatusInternalServerError) {
 		return
 	}
 	err = session.Save(r, w)
-	if err != nil {
-		http.Error(w, "Failed to save session", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to save session", http.StatusInternalServerError) {
 		return
 	}
-	fmt.Println("Session ID:", session.ID)
 	type Response struct {
 		Message string `json:"message"`
 		User    string `json:"user"`
@@ -110,43 +101,45 @@ func SignUp(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 
 	var user User
 	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+	if utils.HandleError(w, err, "Failed to read request body", http.StatusBadRequest) {
 		return
 	}
-	json.Unmarshal(body, &user)
+	err = json.Unmarshal(body, &user)
+	if utils.HandleError(w, err, "Failed to unmarshal request body", http.StatusBadRequest) {
+		return
+	}
+	if user.Username == "" || user.Password == "" {
+		http.Error(w, "Username and password are required", http.StatusBadRequest)
+		return
+	}
+	if len(user.Username) < 3 {
+		http.Error(w, "Username must be at least 3 characters long", http.StatusBadRequest)
+		return
+	}
 	defer r.Body.Close()
 
 	tx, err := DB.Begin()
-	if err != nil {
-		http.Error(w, "Failed to begin transaction", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to begin transaction", http.StatusInternalServerError) {
 		return
 	}
 	defer tx.Rollback()
 
 	var exists bool
 	err = DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE username=?)", user.Username).Scan(&exists)
-	if err != nil {
-		http.Error(w, "Failed to check if user exists", http.StatusInternalServerError)
-		tx.Rollback()
+	if utils.HandleError(w, err, "Failed to check if user exists", http.StatusInternalServerError) {
 		return
 	}
 	if exists {
 		http.Error(w, "Username already exists", http.StatusConflict)
-		tx.Rollback()
 		return
 	}
 	salt := GenerateRandomSalt(16)
 	hashedPassword := HashPassword(user.Password, salt)
 	_, err = tx.Exec("INSERT INTO users (username, password, salt) VALUES (?, ?, ?)", user.Username, hashedPassword, salt)
-	if err != nil {
-		http.Error(w, "Failed to insert user", http.StatusInternalServerError)
-		tx.Rollback()
+	if utils.HandleError(w, err, "Failed to insert user", http.StatusInternalServerError) {
 		return
 	}
-	if err := tx.Commit(); err != nil {
-		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
-		tx.Rollback()
+	if err := tx.Commit(); utils.HandleError(w, err, "Failed to commit transaction", http.StatusInternalServerError) {
 		return
 	}
 	tx.Commit()
@@ -177,8 +170,7 @@ func GenerateRandomSalt(saltSize int) []byte {
 }
 func IsloggedIn(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, DB *sql.DB) {
 	session, err := store.Get(r, "Login-session")
-	if err != nil {
-		http.Error(w, "Failed to get session", http.StatusUnauthorized)
+	if utils.HandleError(w, err, "Failed to get session", http.StatusInternalServerError) {
 		return
 	}
 	if session.Values["username"] == nil {
@@ -200,14 +192,12 @@ func IsloggedIn(w http.ResponseWriter, r *http.Request, store *sessions.CookieSt
 		"user":    session.Values["username"].(string),
 		"session": sessionID,
 	}
-	fmt.Println(response)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 func Logout(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) {
 	session, err := store.Get(r, "Login-session")
-	if err != nil {
-		http.Error(w, "Failed to get session", http.StatusInternalServerError)
+	if utils.HandleError(w, err, "Failed to get session", http.StatusInternalServerError) {
 		return
 	}
 	session.Values["username"] = nil
