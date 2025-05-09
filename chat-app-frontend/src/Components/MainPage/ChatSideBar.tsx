@@ -12,10 +12,9 @@ export default function ChatSideBar(props: ChatSideBarProps) {
     <aside className="w-1/5 bg-[#13135b] p-4  h-screen fixed left-0 mx-0 overflow-y-auto">
         <div className="mt-16">
       {props.users?.map((user, index) => (
-        <div key={index} className="flex items-center cursor-pointer ">
-          <a className="text-white p-4 w-[100%] hover:bg-[#141474] text-start border-[#141474] border-b-2  transition-all duration-500" href={`/chat/${user.friend}`}>{user.friend}</a>
-       
-            <a className=" transition-all duration-500 flex items-center justify-center  text-white rounded-md bg-[#4242ab] p-1 hover:bg-[#32328b] " href={`/friend/${user.id}/${user.friend}`}>
+        <div key={index} className="grid items-center cursor-pointer grid-cols-[70%,30%] gap-2">
+          <a className="text-white p-4  hover:bg-[#141474] text-start border-[#141474] border-b-2  transition-all duration-500 py-2" href={`/chat/${user.friend}`}>{user.friend}</a>
+            <a className=" transition-all duration-500 flex items-center justify-center  text-white rounded-md bg-[#4242ab] p-1 hover:bg-[#32328b] py-2" href={`/friend/${user.id}/${user.friend}`}>
               Options
             </a>
 
