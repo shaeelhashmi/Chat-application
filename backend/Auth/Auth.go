@@ -78,7 +78,12 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, 
 		return
 	}
 	err = session.Save(r, w)
+	fmt.Println("Session saved")
 	if utils.HandleError(w, err, "Failed to save session", http.StatusInternalServerError) {
+		return
+	}
+	err = tx.Commit()
+	if utils.HandleError(w, err, "Failed to commit transaction", http.StatusInternalServerError) {
 		return
 	}
 	type Response struct {
