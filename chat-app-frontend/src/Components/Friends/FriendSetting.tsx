@@ -7,6 +7,15 @@ export default function FriendSetting() {
   const [user,setUser]=useState<string>("")
   const [found,setFound]=useState<boolean>(true)
   const selector=useSelector((state:any)=>state.userName)
+  const RemoveFriend=async()=>{
+    try {
+      const response = await axios.delete(`http://localhost:8080/friend/remove?friendid=${id}&friendname=${name}`, {withCredentials:true});
+      console.log(response.data);
+    }
+    catch (error) {
+      console.error("Error removing friend:", error);
+    }
+  }
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -37,10 +46,10 @@ export default function FriendSetting() {
       <h2 className="text-2xl">Id information</h2>
       <p className="text-md ">Name:{name}</p>
       <div className="flex gap-2 justify-center items-center mt-5 w-full">
-      <button onClick={() => alert("Unfriend functionality not implemented yet")} className="rounded-md bg-red-500 text-white px-4 py-2 hover:bg-red-600 transition duration-300">
+      <button onClick={RemoveFriend} className="rounded-md bg-red-700 text-white px-4 py-2 hover:bg-red-600 transition duration-300">
         Unfriend
       </button>
-      <button onClick={() => alert("Block functionality not implemented yet")} className="rounded-md bg-red-500 text-white px-4 py-2 hover:bg-red-600 transition duration-300">
+      <button onClick={() => alert("Block functionality not implemented yet")} className="rounded-md bg-red-700 text-white px-4 py-2 hover:bg-red-600 transition duration-300">
         Block
       </button>
       </div>
