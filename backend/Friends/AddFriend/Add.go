@@ -100,8 +100,7 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 func AcceptRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 
 	data, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+	if utils.HandleError(w, err, "Failed to read request body", http.StatusBadRequest) {
 		return
 	}
 	tx, err := DB.Begin()
@@ -118,7 +117,6 @@ func AcceptRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 	}
 	_, err = tx.Exec("UPDATE requests SET status = 'accepted' WHERE id=?", id.ID)
 	if utils.HandleError(w, err, "Failed to update request status", http.StatusInternalServerError) {
-
 		return
 	}
 	var receiverID, senderID int

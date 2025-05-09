@@ -6,6 +6,7 @@ import (
 	configurations "chat-app-backend/Configurations"
 	friends "chat-app-backend/Friends/AddFriend"
 	delete "chat-app-backend/Friends/DeleteRequests"
+	"chat-app-backend/Friends/Exists"
 	"chat-app-backend/Settings"
 	"chat-app-backend/Socket"
 	"net/http"
@@ -71,6 +72,9 @@ func main() {
 	})
 	http.HandleFunc("/settings/password", func(w http.ResponseWriter, r *http.Request) {
 		Settings.ChangePassword(w, r, DB, store)
+	})
+	http.HandleFunc("/friend/exists", func(w http.ResponseWriter, r *http.Request) {
+		Exists.Exists(w, r, DB, store)
 	})
 	handler := corsHandler.Handler(http.DefaultServeMux)
 	http.ListenAndServe(":8080", handler)

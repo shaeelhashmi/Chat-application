@@ -11,10 +11,10 @@ import ChatSideBar from '../Components/MainPage/ChatSideBar';
 import MessageBody from '../Components/MainPage/MessageBody';
 import HomePage from '../Components/MainPage/HomePage';
 import RecievedRequest from '../Components/Requests/RecievedRequest';
-import Settings from '../Components/Settings.tsx/Settings';
-import ChangeUserName from '../Components/Settings.tsx/ChangeUserName';
-import ChangePassword from '../Components/Settings.tsx/ChangePassword';
-import SettingSideBar from '../Components/Settings.tsx/SideBar/SettingSideBar';
+import Settings from '../Components/Settings/Settings';
+import ChangeUserName from '../Components/Settings/ChangeUserName';
+import ChangePassword from '../Components/Settings/ChangePassword';
+import SettingSideBar from '../Components/Settings/SideBar/SettingSideBar';
 import FriendSetting from '../Components/Friends/FriendSetting';
 export default function AppRoutes() {
     const [users, setUsers] = useState<string[]>([]);
