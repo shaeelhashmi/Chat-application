@@ -22,6 +22,8 @@ type MessageResponse struct {
 	Reciever string `json:"reciever"`
 	Message  string `json:"message"`
 	Time     string `json:"created_at"`
+	Id       int    `json:"id"`
+	ToSender bool   `json:"toSender"`
 }
 
 var Connections = make(map[string]*websocket.Conn)
@@ -34,7 +36,6 @@ func SendMessage(receiver string, msg []byte) {
 	mu.Lock()
 	conn, exists := Connections[receiver]
 	mu.Unlock()
-
 	if exists {
 		err := conn.WriteMessage(websocket.TextMessage, msg)
 		if err != nil {
@@ -105,10 +106,18 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			conn.Close()
 			return
 		}
-		_, err = stmt.Exec(SenderID, ReceiverID, msg1)
+		result, err := stmt.Exec(SenderID, ReceiverID, msg1)
 		if err != nil {
 			fmt.Println("Error executing statement:", err)
 			errMsg := fmt.Sprintf("Failed to execute statement: %v", err)
+			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
+			conn.Close()
+			return
+		}
+		lastID, err := result.LastInsertId()
+		if err != nil {
+			fmt.Println("Error getting last insert ID:", err)
+			errMsg := fmt.Sprintf("Failed to get last insert ID: %v", err)
 			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 			conn.Close()
 			return
@@ -118,6 +127,8 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			messageData.Reciever,
 			messageData.Message,
 			time.Now().Format("2006-01-02 15:04:05"),
+			int(lastID),
+			false,
 		}
 		resposeBytes, err := json.Marshal(response)
 		if err != nil {
@@ -125,6 +136,13 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			continue
 		}
 		go SendMessage(receiver, resposeBytes)
+		response.ToSender = true
+		resposeBytes, err = json.Marshal(response)
+		if err != nil {
+			fmt.Println("Error marshalling response:", err)
+			continue
+		}
+		go SendMessage(sender, resposeBytes)
 	}
 
 	mu.Lock()

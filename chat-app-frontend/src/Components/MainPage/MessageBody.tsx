@@ -3,11 +3,13 @@ import { useState,useEffect,useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import DeleteMessageBtn from "./DeleteMessageBtn";
 interface Message {
   sender: string;
   reciever: string;
   message: string;
   created_at: string;
+  id: number;
 }
 export default function MessageBody() {
   const params = useParams<{ id?: string }>();
@@ -20,6 +22,7 @@ const socketRef = useRef<WebSocket | null>(null);
 const recieveMessages= async ()=>{
   try {
   const response=await axios.get(`http://localhost:8080/api/messages?reciever=${reciever}`,{withCredentials:true})
+  console.log(response.data);
   setMessagesList(response.data);
   }
   catch (error) {
@@ -49,9 +52,12 @@ const formConnection = async () => {
             
             let parsedData = JSON.parse(event.data)
             console.log(parsedData)
+            if (!parsedData.toSender)
+            {
             new Notification('Hello from your React app!', {
               body: `Message from ${parsedData.sender}: ${parsedData.message}`,
             });
+          }
             setMessagesList(prevMessages => [...(prevMessages || []), parsedData]);
         });
     
@@ -102,8 +108,6 @@ const sendMessage = () => {
             reciever: reciever,
             message: Messages,
             });
-        console.log("Sending message:", messageData);
-        setMessagesList(prevMessages => [...(prevMessages||[]), { sender: user, reciever, message: Messages, created_at: new Date().toISOString() }]);
         socketRef.current.send(messageData);
         setMessages("");
     } else {
@@ -115,10 +119,13 @@ const sendMessage = () => {
   < >
    
     <div className=" h-full   mt-14 p-2 ml-[3%] w-full">
-      {MessagesList?.map((message, index) => (
+      {MessagesList?.map((message:any, index) => (
         <div key={index} className={`flex  mt-4 ${message.sender==user?"justify-end":""}`}>
           <div className={`bg-[#141474] text-white p-4 rounded-lg w-[50%] `}>
-            <div><p>{message.message}</p></div>
+            <div className="flex justify-between">
+              <p>{message.message}</p>
+              <DeleteMessageBtn id={message.id}/>
+              </div>
             <div><p className="text-sm font-light text-end">{new Date(message.created_at).toLocaleString()}</p></div></div>
         </div>
       ))}

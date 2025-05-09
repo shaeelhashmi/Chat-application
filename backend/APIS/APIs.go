@@ -120,6 +120,7 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 		Reciever  string    `json:"reciever"`
 		Message   string    `json:"message"`
 		CreatedAt time.Time `json:"created_at"`
+		ID        int       `json:"id"`
 	}
 	var recieverId int
 	err = DB.QueryRow("SELECT id FROM users WHERE username = ?", reciever).Scan(&recieverId)
@@ -132,7 +133,7 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 		return
 	}
 
-	rows, err := DB.Query("SELECT sender, receiver, message, created_at FROM messages WHERE (sender = ? AND receiver = ?) OR (receiver = ? AND sender = ?)", senderId, recieverId, senderId, recieverId)
+	rows, err := DB.Query("SELECT id,sender, receiver, message, created_at FROM messages WHERE (sender = ? AND receiver = ?) OR (receiver = ? AND sender = ?)", senderId, recieverId, senderId, recieverId)
 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
 		return
 	}
@@ -144,10 +145,12 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 			Reciever  string    `json:"reciever"`
 			Message   string    `json:"message"`
 			CreatedAt time.Time `json:"created_at"`
+			ID        int       `json:"id"`
 		}
 		var createdAt string
+		var messageID int
 		var senderId, recieverId int
-		if err := rows.Scan(&senderId, &recieverId, &msg.Message, &createdAt); utils.HandleError(w, err, "Error reading data", http.StatusInternalServerError) {
+		if err := rows.Scan(&messageID, &senderId, &recieverId, &msg.Message, &createdAt); utils.HandleError(w, err, "Error reading data", http.StatusInternalServerError) {
 			return
 		}
 		msg.CreatedAt, err = time.Parse("2006-01-02 15:04:05", createdAt)
@@ -162,6 +165,7 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 		if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
 			return
 		}
+		msg.ID = messageID
 
 		messages = append(messages, msg)
 	}
