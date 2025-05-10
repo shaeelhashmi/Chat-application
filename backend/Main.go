@@ -3,6 +3,7 @@ package main
 import (
 	apis "chat-app-backend/APIS"
 	"chat-app-backend/Auth"
+	block "chat-app-backend/Block"
 	configurations "chat-app-backend/Configurations"
 	friends "chat-app-backend/Friends/AddFriend"
 	delete "chat-app-backend/Friends/DeleteRequests"
@@ -83,6 +84,9 @@ func main() {
 	})
 	http.HandleFunc("/message/delete", func(w http.ResponseWriter, r *http.Request) {
 		messages.DeleteMessage(w, r, DB, store)
+	})
+	http.HandleFunc("/block", func(w http.ResponseWriter, r *http.Request) {
+		block.BlockHandler(w, r, DB, store)
 	})
 
 	handler := corsHandler.Handler(http.DefaultServeMux)

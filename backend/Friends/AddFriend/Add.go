@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 
+	blockutils "chat-app-backend/Block/Utils"
 	utils "chat-app-backend/Utils"
 
 	"github.com/go-sql-driver/mysql"
@@ -36,10 +37,36 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 	if utils.HandleError(w, err, "Failed to unmarshal request body", http.StatusBadRequest) {
 		return
 	}
+	var userID int
+	err = DB.QueryRow("select id from users where username=?", user).Scan(&userID)
+	if utils.HandleError(w, err, "Failed to get user ID", http.StatusInternalServerError) {
+		return
+	}
 	if username.Username == user {
 		http.Error(w, "Cannot add yourself as a friend", http.StatusBadRequest)
 		return
 	}
+	Blocked, err := blockutils.Blocked(DB, userID, "blocked")
+	if utils.HandleError(w, err, "Failed to get blocked users", http.StatusInternalServerError) {
+		return
+	}
+	Blocked2, err := blockutils.Blocked(DB, userID, "blocked_by")
+	if utils.HandleError(w, err, "Failed to get blocked users", http.StatusInternalServerError) {
+		return
+	}
+	Blocked = append(Blocked, Blocked2...)
+	var friendID int
+	err = DB.QueryRow("SELECT id FROM users WHERE username=?", username.Username).Scan(&friendID)
+	if utils.HandleError(w, err, "Failed to get friend ID", http.StatusInternalServerError) {
+		return
+	}
+	for _, blockedUser := range Blocked {
+		if blockedUser == friendID {
+			http.Error(w, "Cannot send friend request to blocked user", http.StatusBadRequest)
+			return
+		}
+	}
+
 	tx, err := DB.Begin()
 	if utils.HandleError(w, err, "Failed to begin transaction", http.StatusInternalServerError) {
 		return
@@ -127,6 +154,10 @@ func AcceptRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 	}
 	_, err = tx.Exec("INSERT INTO friends (Friend1, Friend2) VALUES (?, ?)", senderID, receiverID)
 	if utils.HandleError(w, err, "Failed to insert friend", http.StatusInternalServerError) {
+		return
+	}
+	_, err = tx.Exec("DELETE FROM requests WHERE id=?", id.ID)
+	if utils.HandleError(w, err, "Failed to delete request", http.StatusInternalServerError) {
 		return
 	}
 	err = tx.Commit()

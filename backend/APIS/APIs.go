@@ -1,6 +1,7 @@
 package apis
 
 import (
+	blockutils "chat-app-backend/Block/Utils"
 	utils "chat-app-backend/Utils"
 	"database/sql"
 	"encoding/json"
@@ -88,7 +89,30 @@ func ImportUsers(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sess
 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
 		return
 	}
-
+	var id int
+	err = DB.QueryRow("SELECT id FROM users WHERE username = ?", loginUser.Values["username"]).Scan(&id)
+	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+	blockedUsers, err := blockutils.Blocked(DB, id, "blocked_by")
+	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+	blockedUsers2, err := blockutils.Blocked(DB, id, "blocked")
+	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+	blockedUsers = append(blockedUsers, blockedUsers2...)
+	var blockedUsersMap = make(map[string]bool)
+	for _, blockedUser := range blockedUsers {
+		var username string
+		err = DB.QueryRow("SELECT username FROM users WHERE id = ?", blockedUser).Scan(&username)
+		if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+			return
+		}
+		blockedUsersMap[username] = true
+	}
+	fmt.Print(blockedUsersMap)
 	defer users.Close()
 
 	var usernames []string
@@ -97,12 +121,15 @@ func ImportUsers(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sess
 		if err := users.Scan(&username); utils.HandleError(w, err, "Error scanning username", http.StatusInternalServerError) {
 			return
 		}
+		if _, exists := blockedUsersMap[username]; exists {
+			continue
+		}
 		usernames = append(usernames, username)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	fmt.Print(usernames)
 	json.NewEncoder(w).Encode(usernames)
-
 }
 
 func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
