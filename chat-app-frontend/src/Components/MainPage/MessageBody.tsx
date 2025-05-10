@@ -19,6 +19,9 @@ const [MessagesList, setMessagesList] = useState<Message[] | null>([]);
 const [user, setUser] = useState("");
 const navigate = useNavigate();
 const socketRef = useRef<WebSocket | null>(null);
+const onDelete = (id: number) => {
+  setMessagesList((prevMessages) => prevMessages?.filter((message) => message.id !== id) || []);
+}
 const recieveMessages= async ()=>{
   try {
   const response=await axios.get(`http://localhost:8080/api/messages?reciever=${reciever}`,{withCredentials:true})
@@ -124,7 +127,7 @@ const sendMessage = () => {
           <div className={`bg-[#141474] text-white p-4 rounded-lg w-[50%] `}>
             <div className="flex justify-between">
               <p>{message.message}</p>
-              <DeleteMessageBtn id={message.id}/>
+              <DeleteMessageBtn id={message.id} onDelete={onDelete}/>
               </div>
             <div><p className="text-sm font-light text-end">{new Date(message.created_at).toLocaleString()}</p></div></div>
         </div>

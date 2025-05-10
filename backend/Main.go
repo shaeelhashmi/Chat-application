@@ -8,6 +8,7 @@ import (
 	delete "chat-app-backend/Friends/DeleteRequests"
 	"chat-app-backend/Friends/Exists"
 	removefriend "chat-app-backend/Friends/RemoveFriend"
+	messages "chat-app-backend/Messages"
 	"chat-app-backend/Settings"
 	"chat-app-backend/Socket"
 	"net/http"
@@ -79,6 +80,9 @@ func main() {
 	})
 	http.HandleFunc("/friend/remove", func(w http.ResponseWriter, r *http.Request) {
 		removefriend.RemoveFriend(w, r, DB, store)
+	})
+	http.HandleFunc("/message/delete", func(w http.ResponseWriter, r *http.Request) {
+		messages.DeleteMessage(w, r, DB, store)
 	})
 
 	handler := corsHandler.Handler(http.DefaultServeMux)
