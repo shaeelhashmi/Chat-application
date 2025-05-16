@@ -16,6 +16,16 @@ export default function FriendSetting() {
       console.error("Error removing friend:", error);
     }
   }
+  const handleBlock=async()=>{
+    try {
+      const response = await axios.get(`http://localhost:8080/block?friendship_id=${id}&friend_name=${name}`, {withCredentials:true});
+      console.log(response.data);
+    }
+    catch (error) {
+      console.error("Error blocking friend:", error);
+    }
+  }
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -49,7 +59,7 @@ export default function FriendSetting() {
       <button onClick={RemoveFriend} className="rounded-md bg-red-700 text-white px-4 py-2 hover:bg-red-600 transition duration-300">
         Unfriend
       </button>
-      <button onClick={() => alert("Block functionality not implemented yet")} className="rounded-md bg-red-700 text-white px-4 py-2 hover:bg-red-600 transition duration-300">
+      <button onClick={handleBlock} className="rounded-md bg-red-700 text-white px-4 py-2 hover:bg-red-600 transition duration-300">
         Block
       </button>
       </div>

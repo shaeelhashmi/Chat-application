@@ -12,8 +12,11 @@ import (
 	messages "chat-app-backend/Messages"
 	"chat-app-backend/Settings"
 	"chat-app-backend/Socket"
+	"log"
 	"net/http"
+	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
@@ -58,7 +61,7 @@ func main() {
 		apis.RecievedRequests(w, r, DB, store)
 	})
 	http.HandleFunc("/acceptrequest", func(w http.ResponseWriter, r *http.Request) {
-		friends.AcceptRequests(w, r, DB)
+		friends.AcceptRequests(w, r, DB, store)
 	})
 	http.HandleFunc("/api/friends", func(w http.ResponseWriter, r *http.Request) {
 		apis.Friends(w, r, DB, store)
@@ -88,7 +91,10 @@ func main() {
 	http.HandleFunc("/block", func(w http.ResponseWriter, r *http.Request) {
 		block.BlockHandler(w, r, DB, store)
 	})
-
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	handler := corsHandler.Handler(http.DefaultServeMux)
-	http.ListenAndServe(":8080", handler)
+	http.ListenAndServe(os.Getenv("Address"), handler)
 }

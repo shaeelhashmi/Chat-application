@@ -118,13 +118,30 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 		http.Error(w, "Failed to insert friend request", http.StatusInternalServerError)
 		return
 	}
+	_, err = tx.Exec("INSERT INTO events (Evnt,relatedTo) VALUES (?,?)", fmt.Sprintf("Sent friend request to %s", username.Username), userId)
+	if utils.HandleError(w, err, "Failed to insert event", http.StatusInternalServerError) {
+		return
+	}
+	_, err = tx.Exec("INSERT INTO events (Evnt,relatedTo) VALUES (?,?)", fmt.Sprintf("Received friend request from %s", user), friendId)
+	if utils.HandleError(w, err, "Failed to insert event", http.StatusInternalServerError) {
+		return
+	}
 	err = tx.Commit()
 	if utils.HandleError(w, err, "Failed to commit transaction", http.StatusInternalServerError) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 }
-func AcceptRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
+func AcceptRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
+	session, err := store.Get(r, "Login-session")
+	if utils.HandleError(w, err, "Failed to get session", http.StatusInternalServerError) {
+		return
+	}
+	if session.Values["username"] == nil {
+		http.Error(w, "User not logged in", http.StatusUnauthorized)
+		return
+	}
+	userName := session.Values["username"].(string)
 
 	data, err := io.ReadAll(r.Body)
 	if utils.HandleError(w, err, "Failed to read request body", http.StatusBadRequest) {
@@ -158,6 +175,19 @@ func AcceptRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 	}
 	_, err = tx.Exec("DELETE FROM requests WHERE id=?", id.ID)
 	if utils.HandleError(w, err, "Failed to delete request", http.StatusInternalServerError) {
+		return
+	}
+	var friendName string
+	err = DB.QueryRow("SELECT username FROM users WHERE id=?", senderID).Scan(&friendName)
+	if utils.HandleError(w, err, "Failed to get friend name", http.StatusInternalServerError) {
+		return
+	}
+	_, err = tx.Exec("INSERT INTO events (Evnt,relatedTo) VALUES (?,?)", fmt.Sprintf("Became friends with %s", friendName), receiverID)
+	if utils.HandleError(w, err, "Failed to insert event", http.StatusInternalServerError) {
+		return
+	}
+	_, err = tx.Exec("INSERT INTO events (Evnt,relatedTo) VALUES (?,?)", fmt.Sprintf("Became friends with %s", userName), senderID)
+	if utils.HandleError(w, err, "Failed to insert event", http.StatusInternalServerError) {
 		return
 	}
 	err = tx.Commit()

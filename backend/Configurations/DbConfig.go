@@ -46,7 +46,7 @@ func ConfigSessions() *sessions.CookieStore {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	var store = sessions.NewCookieStore([]byte("secret-key"))
+	var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 	// Configure session options
 	store.Options = &sessions.Options{
 		Path:     "/",

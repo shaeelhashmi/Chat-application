@@ -43,12 +43,27 @@ func RemoveFriend(w http.ResponseWriter, r *http.Request, db *sql.DB, store *ses
 	if utils.HandleError(w, err, "Error getting friend ID", http.StatusInternalServerError) {
 		return
 	}
-	_, err = db.Exec("DELETE FROM requests WHERE (sender=? AND receiver=?) OR (sender=? AND receiver=?)", userID, friendIDInt, friendIDInt, userID)
+	tx, err := db.Begin()
+	if utils.HandleError(w, err, "Error starting transaction", http.StatusInternalServerError) {
+		return
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("DELETE FROM requests WHERE (sender=? AND receiver=?) OR (sender=? AND receiver=?)", userID, friendIDInt, friendIDInt, userID)
 	if utils.HandleError(w, err, "Error deleting request", http.StatusInternalServerError) {
 		return
 	}
-	_, err = db.Exec("DELETE FROM friends WHERE id=? AND (friend1=? OR friend2=?)", friendID, userID, userID)
+	_, err = tx.Exec("DELETE FROM friends WHERE id=? AND (friend1=? OR friend2=?)", friendID, userID, userID)
 	if utils.HandleError(w, err, "Error removing friend", http.StatusInternalServerError) {
+		return
+	}
+	_, err = tx.Exec("INSERT INTO events (Evnt,relatedTo) VALUES (?,?)", "Removed friend "+friendName, userID)
+
+	if utils.HandleError(w, err, "Error inserting event", http.StatusInternalServerError) {
+		return
+	}
+	err = tx.Commit()
+	if utils.HandleError(w, err, "Error committing transaction", http.StatusInternalServerError) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)

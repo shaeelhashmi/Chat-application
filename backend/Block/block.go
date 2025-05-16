@@ -3,6 +3,7 @@ package block
 import (
 	utils "chat-app-backend/Utils"
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -54,6 +55,11 @@ func BlockHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *ses
 	}
 	_, err = tx.Exec("DELETE FROM friends WHERE id = ?", friendShipID)
 	if utils.HandleError(w, err, "Failed to delete friendship", http.StatusInternalServerError) {
+		return
+	}
+	query := fmt.Sprintf("Blocked user %s by user %s", friendName, username)
+	_, err = tx.Exec("INSERT INTO events (Evnt,relatedTo) VALUES (?,?)", query, userID)
+	if utils.HandleError(w, err, "Failed to insert event", http.StatusInternalServerError) {
 		return
 	}
 	err = tx.Commit()
