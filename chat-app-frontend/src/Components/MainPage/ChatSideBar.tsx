@@ -1,15 +1,23 @@
-
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import Coverpage from "../Coverpage";
 interface ChatSideBarProps {
     users: any[];
 }
 
 export default function ChatSideBar(props: ChatSideBarProps) {
+  const selector = useSelector((state: any) => state.show);
+  useEffect(() => {
+    console.log(selector);
+  }, [selector]);
 
   return (  
     <>
    
     <div>
-    <aside className="w-1/5 bg-[#cbcbff] p-4  h-screen fixed left-0 mx-0 overflow-y-auto">
+      {selector.open && <Coverpage />}
+
+    <aside className={`lg:w-1/5 w-[90%] bg-[#cbcbff] p-4  h-screen fixed left-0 mx-0 overflow-y-auto  ${selector.open ?"scale-100":"scale-0"} transition-all duration-500 ease-in-out origin-top-left z-40`}>
         <div className="mt-16">
       {props.users?.map((user, index) => (
         <div key={index} className="grid items-center cursor-pointer grid-cols-[70%,30%] gap-2 my-4">

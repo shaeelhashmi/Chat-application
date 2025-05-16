@@ -81,7 +81,7 @@ export default function AppRoutes() {
         <Route path='/requests/sent' element={
         <>
         <Navbar users={users}/>
-        <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+       <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
         <ChatSideBar users={friends}/>
         <SentRequest  ></SentRequest>
         
@@ -92,7 +92,7 @@ export default function AppRoutes() {
       <Route path='/settings' element={
         <>
               <Navbar users={users}/>   
-              <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+             <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
               <SettingSideBar />
               <Settings />
               </div>
@@ -102,7 +102,7 @@ export default function AppRoutes() {
         <>
               <Navbar users={users}/>   
               
-              <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+             <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
               <SettingSideBar />
               <ChangeUserName />
               </div>
@@ -111,7 +111,7 @@ export default function AppRoutes() {
             <Route path='/settings/password' element={
         <>
               <Navbar users={users}/>   
-              <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+             <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
               <SettingSideBar />
               <ChangePassword />
               </div>
@@ -120,7 +120,7 @@ export default function AppRoutes() {
       <Route path='/chat/:id' element={
         <>
         <Navbar users={users}/>     
-        <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+       <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
         <ChatSideBar users={friends}/>
         <MessageBody  ></MessageBody>
         </div>
@@ -128,7 +128,7 @@ export default function AppRoutes() {
          <Route path='/chat' element={
         <>
         <Navbar users={users}/>     
-        <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+        <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
         <ChatSideBar users={friends}/>
         <HomePage  ></HomePage>
         </div>
@@ -136,7 +136,7 @@ export default function AppRoutes() {
          <Route path='/requests/recieved' element={
         <>
         <Navbar users={users}/>     
-        <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+         <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
         <ChatSideBar users={friends}/>
         <RecievedRequest  ></RecievedRequest>
         </div>
@@ -144,12 +144,15 @@ export default function AppRoutes() {
          <Route path="/friend/:id/:name" element={
         <>
         <Navbar users={users}/>
+          <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
+        <ChatSideBar users={friends}/>
         <FriendSetting />
+        </div>
         </>} />
           <Route path='/settings/activity' element={
         <>
               <Navbar users={users}/>   
-              <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+              <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
               <SettingSideBar />
               <Activitylog />
               </div>

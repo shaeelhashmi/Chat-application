@@ -50,7 +50,7 @@ export default function FriendSetting() {
     <>
    {
     found ?
-    <div className="mt-20 text-white">
+    <div className="mt-20 text-black">
       <h2 className="text-4xl text-center">Friend </h2>
       <div className="mx-10">
       <h2 className="text-2xl">Id information</h2>
