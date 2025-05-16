@@ -36,7 +36,7 @@ export default function RecievedRequest() {
     <div className="mt-20">
       {
         recievedRequests?.map((request:any) => (
-          <div key={request.id} className="flex justify-between items-center p-2 border-b border-gray-300  ml-20 text-white my-5">
+          <div key={request.id} className="flex justify-between items-center p-2 border-b border-gray-600 my-5 ml-20 text-black">
             <div className="flex items-center ">
               <span>{request.sender}</span>
             </div>

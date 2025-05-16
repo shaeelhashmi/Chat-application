@@ -29,13 +29,13 @@ export default function SentRequest() {
     <div className="mt-20">
       {
         sentRequests?.map((request:any) => (
-          <div key={request.id} className="flex justify-between items-center p-2 border-b border-gray-300 my-5 ml-20 text-white">
+          <div key={request.id} className="flex justify-between items-center p-2 border-b border-gray-600 my-5 ml-20 text-black">
             <div className="flex items-center ">
               <span>{request.reciever}</span>
             </div>
             <div className="flex items-center">
   
-                <button className="ml-5 p-1 bg-red-700 text-white rounded-lg" onClick={()=>handleDeleteRequest(request.id)}>Delete request</button>           
+                <button className="ml-5 p-1 bg-red-700 text-white rounded-lg py-2" onClick={()=>handleDeleteRequest(request.id)}>Delete request</button>           
             </div>
           </div>
         ))

@@ -32,7 +32,7 @@ export default function ChangePassword() {
     <div>
       <div className="flex justify-center flex-col">
         <div className="flex justify-center items-center mb-4">
-        <h1 className="text-2xl font-bold mb-4 text-center text-white">Change Password</h1>
+        <h1 className="text-2xl font-bold mb-4 text-center text-black">Change Password</h1>
         </div>
 
     <div className="flex justify-center items-center mb-4">

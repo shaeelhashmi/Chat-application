@@ -16,17 +16,17 @@ export default function Navbar(props: NavbarProps) {
       setUser(selector.userName)
     },[selector])
   return (
-    <div className="fixed top-0 w-screen p-3 pt-4 bg-[#13135b] flex z-50  border-b-2 border-[#000000] ">
+    <div className="fixed top-0 w-screen p-3 pt-4 bg-[#d3d3ff] flex z-50  ">
       {showPopup && <FriendPopup users={props.users} setState={setShowPopup}/>}
 
       <div className=" w-1/2 pr-10">
-        <h1 className="text-white text-2xl font-bold">{user}</h1>
+        <h1 className="text-black text-2xl font-bold">{user}</h1>
       </div>
       <div className="w-full pr-10 relative top-1">
-        <Link to="/chat" className="text-white w-[49px] p-2 bg-[#000000] bg-opacity-50 rounded-lg hover:shadow-xl duration-500 transition-all mx-3">Home</Link>
-        <Link to="/requests/recieved" className="text-white w-[49px] p-2 bg-[#000000] bg-opacity-50 rounded-lg hover:shadow-xl duration-500 transition-all mx-3">Pending requests</Link>
-        <Link to="/requests/sent" className="text-white w-[49px] p-2 bg-[#000000] bg-opacity-50 rounded-lg hover:shadow-xl duration-500 transition-all mx-3">Sent requests</Link>
-        <Link to="/settings" className="text-white w-[49px] p-2 bg-[#000000] bg-opacity-50 rounded-lg hover:shadow-xl duration-500 transition-all mx-3">Settings</Link>
+        <Link to="/chat" className="text-white w-[49px] p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 text-black border-b-2 border-[#9898ff]">Home</Link>
+        <Link to="/requests/recieved" className="text-black w-[49px] p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 border-b-2 border-[#9898ff]">Pending requests</Link>
+        <Link to="/requests/sent" className="text-black w-[49px] p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 border-b-2 border-[#9898ff]">Sent requests</Link>
+        <Link to="/settings" className="text-black w-[49px] p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 border-b-2 border-[#9898ff]">Settings</Link>
       </div>
        <div className="flex justify-end w-full ">
        <div className=" pr-10">
