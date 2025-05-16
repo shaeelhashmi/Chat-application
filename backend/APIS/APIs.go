@@ -293,8 +293,54 @@ func RecievedRequests(w http.ResponseWriter, r *http.Request, DB *sql.DB, store 
 		}
 		recievedRequests = append(recievedRequests, request)
 	}
-	fmt.Println(recievedRequests)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(recievedRequests)
+
+}
+func UserActivity(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
+	userName, err := utils.GiveUserName(store, r)
+	if utils.HandleError(w, err, "Error getting session", http.StatusInternalServerError) {
+		return
+	}
+	if userName == "" {
+		http.Error(w, "User not logged in", http.StatusUnauthorized)
+		return
+	}
+	type Activity struct {
+		ID        int       `json:"id"`
+		Username  string    `json:"username"`
+		Activity  string    `json:"activity"`
+		CreatedAt time.Time `json:"created_at"`
+	}
+
+	var userActivity []Activity
+	var Id int
+	err = DB.QueryRow("SELECT id FROM users WHERE username = ?", userName).Scan(&Id)
+	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+	rows, err := DB.Query("SELECT id,Evnt, createdAt FROM events WHERE relatedTo = ?", Id)
+	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var activity Activity
+		var createdAt string
+		if err := rows.Scan(&activity.ID, &activity.Activity, &createdAt); utils.HandleError(w, err, "Error reading data", http.StatusInternalServerError) {
+			return
+		}
+		err = DB.QueryRow("SELECT username FROM users WHERE id = ?", Id).Scan(&activity.Username)
+		if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+			return
+		}
+		activity.CreatedAt, err = time.Parse("2006-01-02 15:04:05", createdAt)
+		if utils.HandleError(w, err, "Error parsing time", http.StatusInternalServerError) {
+			return
+		}
+		userActivity = append(userActivity, activity)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(userActivity)
 
 }

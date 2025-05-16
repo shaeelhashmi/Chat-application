@@ -91,6 +91,9 @@ func main() {
 	http.HandleFunc("/block", func(w http.ResponseWriter, r *http.Request) {
 		block.BlockHandler(w, r, DB, store)
 	})
+	http.HandleFunc("/user/event", func(w http.ResponseWriter, r *http.Request) {
+		apis.UserActivity(w, r, DB, store)
+	})
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")

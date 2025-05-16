@@ -16,6 +16,7 @@ import ChangeUserName from '../Components/Settings/ChangeUserName';
 import ChangePassword from '../Components/Settings/ChangePassword';
 import SettingSideBar from '../Components/Settings/SideBar/SettingSideBar';
 import FriendSetting from '../Components/Friends/FriendSetting';
+import Activitylog from '../Components/Settings/Activity/Activitylog';
 export default function AppRoutes() {
     const [users, setUsers] = useState<string[]>([]);
     const [friends,setFriends] = useState<any[]>([]);
@@ -145,6 +146,15 @@ export default function AppRoutes() {
         <Navbar users={users}/>
         <FriendSetting />
         </>} />
+          <Route path='/settings/activity' element={
+        <>
+              <Navbar users={users}/>   
+              <div className='grid grid-cols-[20%,1fr] w-[95vw]'>
+              <SettingSideBar />
+              <Activitylog />
+              </div>
+        </>
+        } />
 
       </Routes>
     );
