@@ -8,6 +8,7 @@ import {useSelector} from "react-redux";
 import Hamburger from "../SVG/Hamburger";
 import { useDispatch } from "react-redux";
 import { setSidebar } from "../Slice/SideBar";
+import { setSettingsidebar } from "../Slice/SettingSidebar";
 interface NavbarProps {
   users: string[];
 }
@@ -17,16 +18,30 @@ export default function Navbar(props: NavbarProps) {
   const selector=useSelector((state:any)=>state.userName)
   const [showPopup, setShowPopup] = useState(false);
   const [options,setOptions]=useState(false)
+  const [isSetting, setIsSetting] = useState(false)
     const navigate = useNavigate();
+    useEffect(() => {
+      console.log(window.location.pathname)
+  if (window.location.pathname.startsWith("/settings")) {
+          console.log(window.location.pathname)
+    setIsSetting(true);
+  }
+}, []);
     useEffect(() => {
       setUser(selector.userName)
     },[selector])
   return (
-    <div className="fixed top-0 w-screen lg:p-3 p-1 py-4 bg-[#d3d3ff] grid  z-50  grid-cols-[20%,70%,10%]">
+    <div className="fixed top-0 w-screen lg:p-3 p-1 py-4 bg-[#d3d3ff] grid  z-50  grid-cols-[35%,1fr,10%] ">
       {showPopup && <FriendPopup users={props.users} setState={setShowPopup}/>}
 
-      <div className=" w-1/2 lg:pr-10 pr-2 flex flex-row gap-2">
-        <button className=" flex items-center justify-center" onClick={()=>{dispatch(setSidebar())}}>
+      <div className=" lg:pr-10 pr-2 flex flex-row gap-2">
+        <button className=" flex items-center justify-center" onClick={()=>{
+          if(isSetting){
+            dispatch(setSettingsidebar())
+            return
+          }
+          dispatch(setSidebar())
+          }}>
           <Hamburger />
         </button>
         <div className="flex items-center justify-center">
@@ -34,15 +49,15 @@ export default function Navbar(props: NavbarProps) {
         </div>
   
       </div>
-      <div className="w-full pr-10 relative top-1 grid lg:grid-cols-4 grid-cols-2 lg:gap-0">
+      <div className="w-full pr-10 relative top-1 grid lg:grid-cols-4 grid-cols-2 lg:gap-0 place-content-center items-end">
         <div>
-        <Link to="/chat" className="text-black w-16 p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 text-black border-b-2 border-[#9898ff] text-[0.6rem] sm:text-[0.7rem] lg:text-sm">Home</Link>
+        <Link to="/chat" className=" w-16 p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 text-black border-b-2 border-[#9898ff] text-[0.6rem] sm:text-[0.7rem] lg:text-sm" onClick={()=>setIsSetting(false)}>Home</Link>
         </div>
         <div>
-        <Link to="/requests/recieved" className="text-black w-16 p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 border-b-2 border-[#9898ff] text-[0.6rem] sm:text-[0.7rem] lg:text-sm">Pending requests</Link>
+        <Link to="/requests/recieved" className="text-black w-16 p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 border-b-2 border-[#9898ff] text-[0.6rem] sm:text-[0.7rem] lg:text-sm" onClick={()=>setIsSetting(false)}>Pending requests</Link>
         </div>
         <div>
-        <Link to="/requests/sent" className="text-black w-16 p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 border-b-2 border-[#9898ff] text-[0.6rem] sm:text-[0.7rem] lg:text-sm">Sent requests</Link>
+        <Link to="/requests/sent" className="text-black w-16 p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 border-b-2 border-[#9898ff] text-[0.6rem] sm:text-[0.7rem] lg:text-sm" onClick={()=>setIsSetting(false)}>Sent requests</Link>
         </div>
         <div>
         <Link to="/settings" className="text-black w-16 p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 border-b-2 border-[#9898ff] text-[0.6rem] sm:text-[0.7rem] lg:text-sm">Settings</Link>

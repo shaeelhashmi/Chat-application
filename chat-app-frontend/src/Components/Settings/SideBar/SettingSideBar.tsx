@@ -1,10 +1,17 @@
 import { Link } from "react-router-dom"
-
+import { useEffect } from "react"
+import { useSelector } from "react-redux"
+import Coverpage from "../../Coverpage"
 export default function SettingSideBar() {
+  const selector = useSelector((state: any) => state.showSetting)
+  useEffect(() => {
+    console.log(selector)
+  }, [selector]);
   return (
     <>
         <div>
-    <aside className="w-1/5 bg-[#cbcbff] py-4  h-screen fixed left-0 mx-0 overflow-y-auto">
+           {selector.open && <Coverpage />}
+    <aside className={`lg:w-1/5 w-[90%] bg-[#cbcbff] p-4  h-screen fixed left-0 mx-0 overflow-y-auto  ${selector.open ?"scale-100":"scale-0"} transition-all duration-500 ease-in-out origin-top-left z-40`}>
         <div className="mt-16">
       
         <div  className="flex items-center cursor-pointer my-2">
