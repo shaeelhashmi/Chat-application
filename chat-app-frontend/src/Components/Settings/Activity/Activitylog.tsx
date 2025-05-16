@@ -24,9 +24,9 @@ export default function Activitylog() {
         fetchActivity()
     }, [])
   return (
-    <div>
+    <div className="mt-16">
       {activity?.map((item: any) => (
-        <div key={item.id } className="items-center  mt-20 text-black flex justify-between bg-gray-200 p-4 rounded-lg shadow-md ml-20">
+        <div key={item.id } className="items-center  my-8 text-black flex justify-between bg-gray-200 p-4 rounded-lg shadow-md ml-20">
           <p className="text-start">{item.activity}</p>
           <p className="text-start">{item.created_at.toLocaleString()}</p>
         </div>

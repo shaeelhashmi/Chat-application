@@ -109,6 +109,14 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 		http.Error(w, "Friend request already exists", http.StatusConflict)
 		return
 	}
+	err = DB.QueryRow("SELECT EXISTS(SELECT 1 FROM friends WHERE (Friend1=? AND Friend2=?) OR (Friend1=? AND Friend2=?))", userId, friendId, friendId, userId).Scan(&exists)
+	if utils.HandleError(w, err, "Failed to check if users are already friends", http.StatusInternalServerError) {
+		return
+	}
+	if exists {
+		http.Error(w, "Users are already friends", http.StatusConflict)
+		return
+	}
 	_, err = tx.Exec("INSERT INTO requests (sender, receiver) VALUES (?, ?)", userId, friendId)
 	if err != nil {
 		if mysqlErr, ok := err.(*mysql.MySQLError); ok && mysqlErr.Number == 1062 {
