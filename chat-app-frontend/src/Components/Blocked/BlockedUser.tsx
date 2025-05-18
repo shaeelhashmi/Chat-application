@@ -1,5 +1,6 @@
 import axios from "axios"
 import { useEffect, useState } from "react";
+import TextBox from "../Util/TextBox";
 interface BlockedUser {
     id: string;
     username: string;
@@ -28,15 +29,22 @@ export default function BlockedUser() {
         <h1 className="sm:text-4xl text-2xl font-bold text-center">Blocked Users</h1>
         </div>
 {block.map((user: BlockedUser) => (
-  <div key={user.id } className="  my-8 text-black grid grid-cols-2 justify-between bg-gray-300 p-4 rounded-lg shadow-md">
-          <p className="text-start sm:text-base text-sm my-3">{user.username}</p>
-          <div className="justify-self-end">
-            <button className="bg-green-400 p-3 rounded-md justify-self-end my-3" onClick={()=>{
-            axios.get(`http://localhost:8080/unblock?blockedid=${user.id}`, { withCredentials: true })
-          }}>Unblock user</button>   </div>
-          <p className="text-start sm:text-sm text-xsm justify-self-end col-start-2">Blocked on: {user.created_at.toLocaleString()}</p>
-       
-        </div>
+
+  <TextBox handleSubmit={()=>{
+    try{
+    axios.get(`http://localhost:8080/unblock?blockedid=${user.id}`, { withCredentials: true })
+
+    }catch (error){
+
+    }
+  }}
+  element={{id:+user.id,text:user.username,created_at:user.created_at}}
+  buttonText="Unblock user"
+  buttonColor="bg-green-400"
+  dateRepresentation="Blocked on: "
+  />
+ 
+      
 ))}
   
     </>:

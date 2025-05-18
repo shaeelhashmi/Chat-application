@@ -16,7 +16,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+	"chat-app-backend/Activity"
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
@@ -100,6 +100,9 @@ func main() {
 	})
 	http.HandleFunc("/user/event", func(w http.ResponseWriter, r *http.Request) {
 		apis.UserActivity(w, r, DB, store)
+	})
+	http.HandleFunc("/delete/event", func(w http.ResponseWriter, r *http.Request) {
+		activity.DeleteActivity(w, r, DB, store)
 	})
 	err := godotenv.Load()
 	if err != nil {
