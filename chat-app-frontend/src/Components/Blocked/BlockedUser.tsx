@@ -25,7 +25,7 @@ export default function BlockedUser() {
     block != null && block.length > 0  ?
     <>
     <div className="w-full text-black mt-16">
-        <h1 className="text-4xl font-bold text-center">Blocked Users</h1>
+        <h1 className="sm:text-4xl text-2xl font-bold text-center">Blocked Users</h1>
         </div>
 {block.map((user: BlockedUser) => (
   <div key={user.id } className="  my-8 text-black grid grid-cols-2 justify-between bg-gray-300 p-4 rounded-lg shadow-md">
@@ -34,14 +34,14 @@ export default function BlockedUser() {
             <button className="bg-green-400 p-3 rounded-md justify-self-end my-3" onClick={()=>{
             axios.get(`http://localhost:8080/unblock?blockedid=${user.id}`, { withCredentials: true })
           }}>Unblock user</button>   </div>
-          <p className="text-start sm:text-sm text-[0.6rem] justify-self-end col-start-2">Blocked on: {user.created_at.toLocaleString()}</p>
+          <p className="text-start sm:text-sm text-xsm justify-self-end col-start-2">Blocked on: {user.created_at.toLocaleString()}</p>
        
         </div>
 ))}
   
     </>:
   
-        <h1 className="text-4xl font-bold text-center">No Blocked Users</h1>
+        <h1 className="sm:text-4xl text-2xl font-bold text-center">No Blocked Users</h1>
  
 }
     </div>

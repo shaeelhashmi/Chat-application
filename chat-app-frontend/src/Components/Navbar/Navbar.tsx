@@ -50,7 +50,7 @@ export default function Navbar(props: NavbarProps) {
           <Hamburger />
         </button>
         <div className="flex items-center justify-center">
-        <h1 className="text-black lg:text-lg font-bold text-sm xxs:text-[0.8rem]">{user}</h1>
+        <h1 className="text-black lg:text-xl font-bold text-[0.8rem] xxs:text-lg">{user}</h1>
         </div>
   
       </div>
