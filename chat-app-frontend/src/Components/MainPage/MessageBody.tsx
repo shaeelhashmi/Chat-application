@@ -122,14 +122,20 @@ const sendMessage = () => {
   < >
    
     <div className=" h-full   mt-14 p-2 ml-[3%] w-full">
-      {MessagesList?.map((message:any, index) => (
-        <div key={index} className={`flex  mt-4 ${message.sender==user?"justify-end":""}`}>
-          <div className={`bg-[#cbcbff] text-black p-4 rounded-lg w-[50%] `}>
-            <div className="flex justify-between">
-              <p>{message.message}</p>
-              <DeleteMessageBtn id={message.id} onDelete={onDelete}/>
-              </div>
-            <div><p className="text-sm font-light text-end">{new Date(message.created_at).toLocaleString()}</p></div></div>
+      {MessagesList?.map((message: any, index) => (
+        <div key={index} className={`flex mt-4 ${message.sender == user ? "justify-end" : ""}`}>
+          <div
+        className={`bg-[#cbcbff] text-black p-4 rounded-lg w-[50%] break-words whitespace-pre-wrap`}
+        style={{ wordBreak: "break-word" }}
+          >
+        <div className="flex justify-between">
+          <p className="break-words whitespace-pre-wrap">{message.message}</p>
+          <DeleteMessageBtn id={message.id} onDelete={onDelete} />
+        </div>
+        <div>
+          <p className="text-sm font-light text-end">{new Date(message.created_at).toLocaleString()}</p>
+        </div>
+          </div>
         </div>
       ))}
 
@@ -137,7 +143,7 @@ const sendMessage = () => {
         <div className="grid grid-cols-[1fr,5%] bg-white ">
         <div>
         <textarea
-          className="border border-gray-300 w-full py-1 px-2 resize-none outline-none"
+          className="border border-gray-300 w-full py-1 px-2 resize-none outline-none bg-gray-200"
           placeholder="Type a message..."
           value={Messages}
           onChange={(e) => setMessages(e.target.value)}

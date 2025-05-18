@@ -16,12 +16,15 @@ import ChangeUserName from '../Components/Settings/ChangeUserName';
 import ChangePassword from '../Components/Settings/ChangePassword';
 import SettingSideBar from '../Components/Settings/SideBar/SettingSideBar';
 import FriendSetting from '../Components/Friends/FriendSetting';
+import BlockedUser from '../Components/Blocked/BlockedUser';
 import Activitylog from '../Components/Settings/Activity/Activitylog';
 export default function AppRoutes() {
     const [users, setUsers] = useState<string[]>([]);
     const [friends,setFriends] = useState<any[]>([]);
+   
   
     const dispatch = useDispatch()
+
     const fetchFriends = async () => {
       try {
           const response = await axios.get("http://localhost:8080/api/friends", { withCredentials: true });
@@ -155,6 +158,15 @@ export default function AppRoutes() {
               <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
               <SettingSideBar />
               <Activitylog />
+              </div>
+        </>
+        } />
+        <Route path='/settings/blocked' element={
+        <>
+              <Navbar users={users}/>   
+              <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
+              <SettingSideBar />
+              <BlockedUser ></BlockedUser>
               </div>
         </>
         } />

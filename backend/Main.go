@@ -12,6 +12,7 @@ import (
 	messages "chat-app-backend/Messages"
 	"chat-app-backend/Settings"
 	"chat-app-backend/Socket"
+	unblock "chat-app-backend/Unblock"
 	"log"
 	"net/http"
 	"os"
@@ -66,6 +67,9 @@ func main() {
 	http.HandleFunc("/api/friends", func(w http.ResponseWriter, r *http.Request) {
 		apis.Friends(w, r, DB, store)
 	})
+	http.HandleFunc("/api/friends/blocked", func(w http.ResponseWriter, r *http.Request) {
+		apis.BlockedUsers(w, r, DB, store)
+	})
 	http.HandleFunc("/delete/request", func(w http.ResponseWriter, r *http.Request) {
 
 		delete.DeleteReceivedRequest(w, r, DB, store)
@@ -90,6 +94,9 @@ func main() {
 	})
 	http.HandleFunc("/block", func(w http.ResponseWriter, r *http.Request) {
 		block.BlockHandler(w, r, DB, store)
+	})
+	http.HandleFunc("/unblock", func(w http.ResponseWriter, r *http.Request) {
+		unblock.UnblockUser(w, r, store, DB)
 	})
 	http.HandleFunc("/user/event", func(w http.ResponseWriter, r *http.Request) {
 		apis.UserActivity(w, r, DB, store)

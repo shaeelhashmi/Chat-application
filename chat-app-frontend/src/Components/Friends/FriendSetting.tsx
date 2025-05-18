@@ -66,8 +66,8 @@ export default function FriendSetting() {
       </div>
     </div>
     :
-    <div className="mt-20 text-white">
-      <h2 className="text-4xl text-center">Friend not found</h2>
+    <div className="mt-20 text-black">
+      <h2 className="text-4xl text-center font-bold">Friend not found</h2>
       </div>
     }
     </>

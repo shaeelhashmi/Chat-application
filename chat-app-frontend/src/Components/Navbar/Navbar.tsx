@@ -9,6 +9,11 @@ import Hamburger from "../SVG/Hamburger";
 import { useDispatch } from "react-redux";
 import { setSidebar } from "../Slice/SideBar";
 import { setSettingsidebar } from "../Slice/SettingSidebar";
+import { House } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import { UserCheck } from 'lucide-react';
+import { Settings } from 'lucide-react';
+import ToolTipbtn from "./ToolTip/ToolTipbtn";
 interface NavbarProps {
   users: string[];
 }
@@ -31,10 +36,10 @@ export default function Navbar(props: NavbarProps) {
       setUser(selector.userName)
     },[selector])
   return (
-    <div className="fixed top-0 w-screen lg:p-3 p-1 py-4 bg-[#d3d3ff] grid  z-50  grid-cols-[35%,1fr,10%] ">
+    <nav className="fixed top-0 w-screen   bg-[#d3d3ff] grid  z-50  xsm:grid-cols-[30%,1fr,5%] grid-cols-[40%,1fr,5%] md:grid-cols-[20%,1fr,5%]">
       {showPopup && <FriendPopup users={props.users} setState={setShowPopup}/>}
 
-      <div className=" lg:pr-10 pr-2 flex flex-row gap-2">
+      <div className=" lg:pr-10 pr-2 flex flex-row xxs:gap-2 gap-0">
         <button className=" flex items-center justify-center" onClick={()=>{
           if(isSetting){
             dispatch(setSettingsidebar())
@@ -45,29 +50,32 @@ export default function Navbar(props: NavbarProps) {
           <Hamburger />
         </button>
         <div className="flex items-center justify-center">
-        <h1 className="text-black lg:text-lg font-bold text-sm">{user}</h1>
+        <h1 className="text-black lg:text-lg font-bold text-sm xxs:text-[0.8rem]">{user}</h1>
         </div>
   
       </div>
-      <div className="w-full pr-10 relative top-1 grid lg:grid-cols-4 grid-cols-2 lg:gap-0 place-content-center items-end">
+      <div className="w-full pr-10  flex justify-center items-start sm:gap-20 xsm:gap-10 gap-2">
         <div>
-        <Link to="/chat" className=" w-16 p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 text-black border-b-2 border-[#9898ff] text-[0.6rem] sm:text-[0.7rem] lg:text-sm" onClick={()=>setIsSetting(false)}>Home</Link>
+        <Link to="/chat" className="mx-3 " onClick={()=>setIsSetting(false)}><ToolTipbtn text={<House className="sm:w-[24px] w-[15px]"/>} info="Home"/></Link>
         </div>
         <div>
-        <Link to="/requests/recieved" className="text-black w-16 p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 border-b-2 border-[#9898ff] text-[0.6rem] sm:text-[0.7rem] lg:text-sm" onClick={()=>setIsSetting(false)}>Pending requests</Link>
+        <Link to="/requests/recieved" className=" mx-3 " onClick={()=>setIsSetting(false)}><ToolTipbtn text={<UserCheck className="sm:w-[24px] w-[15px]"/>} info="Recieved requests"/></Link>
         </div>
         <div>
-        <Link to="/requests/sent" className="text-black w-16 p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 border-b-2 border-[#9898ff] text-[0.6rem] sm:text-[0.7rem] lg:text-sm" onClick={()=>setIsSetting(false)}>Sent requests</Link>
+        <Link to="/requests/sent" className=" mx-3" onClick={()=>setIsSetting(false)}>
+        <ToolTipbtn text={<ArrowUpRight className="sm:w-[24px] w-[15px] "/>} info="Sent requests"/></Link>
         </div>
         <div>
-        <Link to="/settings" className="text-black w-16 p-2 bg-[#d7d7fd] bg-opacity-50  hover:shadow-xl duration-500 transition-all mx-3 border-b-2 border-[#9898ff] text-[0.6rem] sm:text-[0.7rem] lg:text-sm">Settings</Link>
+        <Link to="/settings" className=" mx-3 " onClick={()=>setIsSetting(true)}><ToolTipbtn text={<Settings className="sm:w-[24px] w-[15px]"/>} info="Settings"/></Link>
         </div>
       </div>
        <div className="flex justify-end w-full ">
         <div>
-          <button onClick={()=>setOptions(!options)} >
+          <div className="items-center justify-center flex relative top-7">
+          <button onClick={()=>setOptions(!options)} className="xsm:mr-3 mr-1">
                 <Elipsis/>
           </button>
+          </div>
     
         <div className={` ${options?"scale-100":"scale-0"} transition-all duration-500 absolute top-10 right-2 origin-top-right `}>
         <div className="py-4  flex flex-col items-center justify-center relative top-2  sm:w-[200px] w-[100px] bg-[#bdbdf9] text-[0.6rem] sm:text-[0.7rem] lg:text-sm">
@@ -87,6 +95,6 @@ export default function Navbar(props: NavbarProps) {
 
        </div>
        
-    </div>
+    </nav>
   )
 }

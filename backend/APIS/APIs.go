@@ -94,11 +94,11 @@ func ImportUsers(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sess
 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
 		return
 	}
-	blockedUsers, err := blockutils.Blocked(DB, id, "blocked_by")
+	blockedUsers, _, _, err := blockutils.Blocked(DB, id, "blocked_by")
 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
 		return
 	}
-	blockedUsers2, err := blockutils.Blocked(DB, id, "blocked")
+	blockedUsers2, _, _, err := blockutils.Blocked(DB, id, "blocked")
 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
 		return
 	}
@@ -343,4 +343,41 @@ func UserActivity(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *ses
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userActivity)
 
+}
+func BlockedUsers(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
+	username, err := utils.GiveUserName(store, r)
+	if err != nil {
+		if err.Error() == "userName not found in session" {
+			utils.HandleError(w, err, "User not logged in", http.StatusUnauthorized)
+			return
+		}
+		utils.HandleError(w, err, "Failed to get username from session", http.StatusInternalServerError)
+		return
+	}
+	var userId int
+	err = DB.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&userId)
+	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+	blockedUsers, blockedID, createdAt, err := blockutils.Blocked(DB, userId, "blocked_by")
+	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+	type blockedUser struct {
+		ID        int    `json:"id"`
+		Username  string `json:"username"`
+		CreatedAt string `json:"created_at"`
+	}
+	var blockedUserName []blockedUser
+	for i := 0; i < len(blockedUsers); i++ {
+		var username string
+		err = DB.QueryRow("SELECT username FROM users WHERE id = ?", blockedUsers[i]).Scan(&username)
+		if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+			return
+		}
+		blockedUserName = append(blockedUserName, blockedUser{blockedID[i], username, createdAt[i]})
+	}
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(blockedUserName)
 }

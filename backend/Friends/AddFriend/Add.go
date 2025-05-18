@@ -46,11 +46,11 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 		http.Error(w, "Cannot add yourself as a friend", http.StatusBadRequest)
 		return
 	}
-	Blocked, err := blockutils.Blocked(DB, userID, "blocked")
+	Blocked, _, _, err := blockutils.Blocked(DB, userID, "blocked")
 	if utils.HandleError(w, err, "Failed to get blocked users", http.StatusInternalServerError) {
 		return
 	}
-	Blocked2, err := blockutils.Blocked(DB, userID, "blocked_by")
+	Blocked2, _, _, err := blockutils.Blocked(DB, userID, "blocked_by")
 	if utils.HandleError(w, err, "Failed to get blocked users", http.StatusInternalServerError) {
 		return
 	}
