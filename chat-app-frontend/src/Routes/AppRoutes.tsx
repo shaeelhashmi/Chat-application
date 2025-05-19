@@ -18,6 +18,7 @@ import SettingSideBar from '../Components/Settings/SideBar/SettingSideBar';
 import FriendSetting from '../Components/Friends/FriendSetting';
 import BlockedUser from '../Components/Blocked/BlockedUser';
 import Activitylog from '../Components/Settings/Activity/Activitylog';
+import PageDistribution from '../Components/Util/PageDistribution';
 interface Message {
   sender: string;
   reciever: string;
@@ -43,7 +44,7 @@ export default function AppRoutes() {
             console.log(parsedData)
             if (!parsedData.toSender)
             {
-            new Notification('Hello from your React app!', {
+            new Notification('Message recieved', {
               body: `Message from ${parsedData.sender}: ${parsedData.message}`,
             });
           }
@@ -145,90 +146,102 @@ export default function AppRoutes() {
         <Route path='/requests/sent' element={
         <>
         <Navbar users={users}/>
-       <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
+        <PageDistribution  text={
+          <> 
         <ChatSideBar users={friends}/>
         <SentRequest  ></SentRequest>
-        
-        </div>
+        </>}
+        />
         </>
       } 
       />
       <Route path='/settings' element={
         <>
               <Navbar users={users}/>   
-             <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
+                <PageDistribution  text={
+          <> 
               <SettingSideBar />
               <Settings />
-              </div>
+        </>
+        }
+        />
         </>
         } />
            <Route path='/settings/user' element={
         <>
               <Navbar users={users}/>   
-              
-             <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
+              <PageDistribution text={
+             <>
               <SettingSideBar />
               <ChangeUserName />
-              </div>
+              </>
+              }
+        />
+             
         </>
         } />
             <Route path='/settings/password' element={
         <>
               <Navbar users={users}/>   
-             <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
+              <PageDistribution text={
+              <>
               <SettingSideBar />
               <ChangePassword />
-              </div>
+              </>
+           
+              }></PageDistribution>
         </>
         } />
       <Route path='/chat/:id' element={
         <>
         <Navbar users={users}/>     
-       <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
-        <ChatSideBar users={friends}/>
-        <MessageBody  setMessagesList={setMessagesList} MessagesList={MessagesList} socketRef={socketRef}></MessageBody>
-        </div>
+        <PageDistribution text={
+          <>
+          <ChatSideBar users={friends}/>
+        <MessageBody  setMessagesList={setMessagesList} MessagesList={MessagesList} socketRef={socketRef}></MessageBody></>
+        } />
+
          </>} />
          <Route path='/chat' element={
         <>
-        <Navbar users={users}/>     
-        <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
-        <ChatSideBar users={friends}/>
+        <Navbar users={users}/>   
+        <PageDistribution text={<>
+            <ChatSideBar users={friends}/>
         <HomePage  ></HomePage>
-        </div>
+        </>}/>  
          </>} />
          <Route path='/requests/recieved' element={
         <>
-        <Navbar users={users}/>     
-         <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
-        <ChatSideBar users={friends}/>
+          <Navbar users={users}/>    
+        <PageDistribution text={<>
+            <ChatSideBar users={friends}/>
         <RecievedRequest  ></RecievedRequest>
-        </div>
+          </>}/>
+       
+
          </>} />
          <Route path="/friend/:id/:name" element={
         <>
         <Navbar users={users}/>
-          <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
-        <ChatSideBar users={friends}/>
+        <PageDistribution text={<>
+          <ChatSideBar users={friends}/>
         <FriendSetting />
-        </div>
+        </>}/>
         </>} />
           <Route path='/settings/activity' element={
         <>
               <Navbar users={users}/>   
-              <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
-              <SettingSideBar />
-              <Activitylog />
-              </div>
+              <PageDistribution text={<><SettingSideBar />
+              <Activitylog /></>}/>
         </>
         } />
         <Route path='/settings/blocked' element={
         <>
               <Navbar users={users}/>   
-              <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
-              <SettingSideBar />
+              <PageDistribution text={<>
+                      <SettingSideBar />
               <BlockedUser ></BlockedUser>
-              </div>
+                </>}/>
         </>
         } />
 
