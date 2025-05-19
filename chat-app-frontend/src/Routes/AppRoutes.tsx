@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState,useRef } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
@@ -18,11 +18,63 @@ import SettingSideBar from '../Components/Settings/SideBar/SettingSideBar';
 import FriendSetting from '../Components/Friends/FriendSetting';
 import BlockedUser from '../Components/Blocked/BlockedUser';
 import Activitylog from '../Components/Settings/Activity/Activitylog';
+interface Message {
+  sender: string;
+  reciever: string;
+  message: string;
+  created_at: string;
+  id: number;
+}
 export default function AppRoutes() {
     const [users, setUsers] = useState<string[]>([]);
     const [friends,setFriends] = useState<any[]>([]);
-   
-  
+   const socketRef = useRef<WebSocket | null>(null);
+
+   /*For sockets*/
+   const [MessagesList, setMessagesList] = useState<Message[] | null>([]);
+   const [user,setUser]=useState<string>("")
+  const formConnection = async () => {
+        const socket = new WebSocket(`ws://localhost:8080/`);
+        socketRef.current = socket;
+        socket.addEventListener("message", (event) => {
+            
+            
+            let parsedData = JSON.parse(event.data)
+            console.log(parsedData)
+            if (!parsedData.toSender)
+            {
+            new Notification('Hello from your React app!', {
+              body: `Message from ${parsedData.sender}: ${parsedData.message}`,
+            });
+          }
+            setMessagesList(prevMessages => [...(prevMessages || []), parsedData]);
+        });
+    
+        socket.addEventListener("close", () => {
+            console.log("WebSocket disconnected");
+        });
+    
+        socket.addEventListener("error", (error) => {
+            console.error("WebSocket error:", error);
+        });
+     
+        socket.addEventListener("open", () => {
+          const testMessage = JSON.stringify({
+            sender: user,
+            reciever: "",
+            message: "Test message from socket",
+          });
+          console.log("Sending test message:", testMessage);
+          socket.send(testMessage);
+        });
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.close();
+            }
+        };
+        }  
+/*For socket*/
+        
     const dispatch = useDispatch()
 
     const fetchFriends = async () => {
@@ -38,6 +90,7 @@ export default function AppRoutes() {
       try {
           const response = await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
           dispatch(setUsername(response.data.user))
+          setUser(response.data.user)
       } catch (error) {
           console.error("Error fetching user:", error);
       }
@@ -72,8 +125,16 @@ export default function AppRoutes() {
         fetchusers();
         fetchFriends();
         fetchUser();
+
   
     }, []);
+    useEffect(() => {
+      if(user=="")
+      {
+        return
+      }
+      formConnection()
+    },[user])
   
   
     return (
@@ -125,7 +186,7 @@ export default function AppRoutes() {
         <Navbar users={users}/>     
        <div className='grid lg:grid-cols-[20%,1fr] w-[95vw]'>
         <ChatSideBar users={friends}/>
-        <MessageBody  ></MessageBody>
+        <MessageBody  setMessagesList={setMessagesList} MessagesList={MessagesList} socketRef={socketRef}></MessageBody>
         </div>
          </>} />
          <Route path='/chat' element={

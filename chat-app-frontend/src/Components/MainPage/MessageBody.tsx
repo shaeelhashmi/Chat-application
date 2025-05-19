@@ -1,9 +1,9 @@
 import SendMsg from "../SVG/SendMsg";
-import { useState,useEffect,useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState,useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import DeleteMessageBtn from "./DeleteMessageBtn";
+import { useSelector } from "react-redux";
 interface Message {
   sender: string;
   reciever: string;
@@ -11,107 +11,54 @@ interface Message {
   created_at: string;
   id: number;
 }
-export default function MessageBody() {
+interface prop{
+  setMessagesList:React.Dispatch<React.SetStateAction<Message[] | null>>
+  MessagesList:Message[] | null
+  socketRef:React.RefObject<WebSocket|null>
+}
+export default function MessageBody(props:prop) {
+  const [user,setUser]=useState("")
+  const selector=useSelector((state:any)=>state.userName)
   const params = useParams<{ id?: string }>();
 const reciever = params.id || "";
 const [Messages, setMessages] = useState("")
-const [MessagesList, setMessagesList] = useState<Message[] | null>([]);
-const [user, setUser] = useState("");
-const navigate = useNavigate();
-const socketRef = useRef<WebSocket | null>(null);
+
 const onDelete = (id: number) => {
-  setMessagesList((prevMessages) => prevMessages?.filter((message) => message.id !== id) || []);
+  props.setMessagesList((prevMessages:any) => prevMessages?.filter((message:any) => message.id !== id) || []);
 }
 const recieveMessages= async ()=>{
   try {
   const response=await axios.get(`http://localhost:8080/api/messages?reciever=${reciever}`,{withCredentials:true})
-  console.log(response.data);
-  setMessagesList(response.data);
+  console.log(response.data)
+  props.setMessagesList(response.data);
   }
   catch (error) {
     console.log("Error fetching messages:", error);
   }
 }
-const fetchUser = async () => {
-  try {
-      const response = await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
-      setUser(response.data.user);
-  
-  } catch (error) {
-      console.error("Error fetching user:", error);
-      navigate("/auth/login");
-  }
-};
-const formConnection = async () => {
-        const socket = new WebSocket(`ws://localhost:8080/`);
-        socketRef.current = socket;
-    
-        socket.addEventListener("open", () => {
-            console.log("WebSocket connected");
-        });
-    
-        socket.addEventListener("message", (event) => {
-            
-            
-            let parsedData = JSON.parse(event.data)
-            console.log(parsedData)
-            if (!parsedData.toSender)
-            {
-            new Notification('Hello from your React app!', {
-              body: `Message from ${parsedData.sender}: ${parsedData.message}`,
-            });
-          }
-            setMessagesList(prevMessages => [...(prevMessages || []), parsedData]);
-        });
-    
-        socket.addEventListener("close", () => {
-            console.log("WebSocket disconnected");
-        });
-    
-        socket.addEventListener("error", (error) => {
-            console.error("WebSocket error:", error);
-        });
-        socket.addEventListener("open", () => {
-          const testMessage = JSON.stringify({
-            sender: user,
-            reciever: "",
-            message: "Test message from socket",
-          });
-          console.log("Sending test message:", testMessage);
-          socket.send(testMessage);
-        });
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.close();
-            }
-        };
-        }  
-      useEffect(() => {
-   
-      }, [MessagesList]); 
+
+
 useEffect(() => { 
   console.log(params.id);
    (async () => {
-    await fetchUser();
     await recieveMessages();
-    await formConnection();
     }
     )()
-}, [user]);
+    setUser(selector.userName)
+    console.log(user)
+}, [selector]);
 
-const sendMessage = () => {
-    if(!socketRef.current) {
-      console.log("Socket is not initialized, creating a new one.");
-        formConnection();
-    
+const sendMessage = async() => {
+    if(!props.socketRef.current) {
+       throw "Websocket is not initialized"
     }
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+    if (props.socketRef.current && props.socketRef.current.readyState === WebSocket.OPEN) {
         const messageData = JSON.stringify({
             sender: user,
             reciever: reciever,
             message: Messages,
             });
-        socketRef.current.send(messageData);
+        props.socketRef.current.send(messageData);
         setMessages("");
     } else {
         console.error("WebSocket is not open");
@@ -122,7 +69,7 @@ const sendMessage = () => {
   < >
    
     <div className=" h-full   mt-14 p-2 ml-[3%] w-full">
-      {MessagesList?.map((message: any, index) => (
+      {props.MessagesList?.map((message: any, index:number) => (
         <div key={index} className={`flex mt-4 ${message.sender == user ? "justify-end" : ""}`}>
           <div
         className={`bg-[#cbcbff] text-black p-4 rounded-lg w-[50%] break-words whitespace-pre-wrap`}
