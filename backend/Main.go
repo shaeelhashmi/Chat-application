@@ -2,6 +2,7 @@ package main
 
 import (
 	apis "chat-app-backend/APIS"
+	activity "chat-app-backend/Activity"
 	"chat-app-backend/Auth"
 	block "chat-app-backend/Block"
 	configurations "chat-app-backend/Configurations"
@@ -16,7 +17,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"chat-app-backend/Activity"
+
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
@@ -103,6 +104,9 @@ func main() {
 	})
 	http.HandleFunc("/delete/event", func(w http.ResponseWriter, r *http.Request) {
 		activity.DeleteActivity(w, r, DB, store)
+	})
+	http.HandleFunc("/user/info", func(w http.ResponseWriter, r *http.Request) {
+		apis.UserInfo(w, r, DB, store)
 	})
 	err := godotenv.Load()
 	if err != nil {

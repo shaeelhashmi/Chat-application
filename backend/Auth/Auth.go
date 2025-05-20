@@ -20,6 +20,11 @@ type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+type signUpUser struct {
+	Username string
+	Password string
+	FullName string
+}
 
 // Replace with your own secret key
 func GenerateSessionID(userName string) string {
@@ -104,12 +109,16 @@ func SignUp(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 		return
 	}
 
-	var user User
+	var user signUpUser
 	body, err := io.ReadAll(r.Body)
 	if utils.HandleError(w, err, "Failed to read request body", http.StatusBadRequest) {
 		return
 	}
+
 	err = json.Unmarshal(body, &user)
+	if utils.HandleError(w, err, "Failed to unmarshal request body", http.StatusBadRequest) {
+		return
+	}
 	if utils.HandleError(w, err, "Failed to unmarshal request body", http.StatusBadRequest) {
 		return
 	}
@@ -140,7 +149,7 @@ func SignUp(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 	}
 	salt := GenerateRandomSalt(16)
 	hashedPassword := HashPassword(user.Password, salt)
-	_, err = tx.Exec("INSERT INTO users (username, password, salt) VALUES (?, ?, ?)", user.Username, hashedPassword, salt)
+	_, err = tx.Exec("INSERT INTO users (username, password, salt,fullName) VALUES (?, ?, ?,?)", user.Username, hashedPassword, salt, user.FullName)
 	if utils.HandleError(w, err, "Failed to insert user", http.StatusInternalServerError) {
 		return
 	}

@@ -381,3 +381,25 @@ func BlockedUsers(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *ses
 
 	json.NewEncoder(w).Encode(blockedUserName)
 }
+func UserInfo(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
+	username, err := utils.GiveUserName(store, r)
+	if err != nil {
+		if err.Error() == "userName not found in session" {
+			utils.HandleError(w, err, "User not logged in", http.StatusUnauthorized)
+			return
+		}
+		utils.HandleError(w, err, "Failed to get username from session", http.StatusInternalServerError)
+		return
+	}
+	type data struct {
+		Username string `json:"username"`
+		Fullname string `json:"fullname"`
+	}
+	var userData data
+	err = DB.QueryRow("SELECT username,fullname FROM users WHERE username = ?", username).Scan(&userData.Username, &userData.Fullname)
+	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(userData)
+}

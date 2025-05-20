@@ -1,10 +1,12 @@
 import {  useState } from "react"
 import axios from "axios"
+import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 export default function Signup() {
  const [error, setError] = useState<string>("")
  const [username, setUsername] = useState<string>("")
  const [password, setPassword] = useState<string>("")
+ const [Name,setFullName] = useState<string>("")
  const navigate = useNavigate()
 
  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,7 +29,8 @@ export default function Signup() {
     try {
         const res = await axios.post("http://localhost:8080/auth/signup", {
             username: username,
-            password: password
+            password: password,
+            fullName: Name
         }, { withCredentials: true })
         setError(res.data.message)
         navigate("/auth/login")
@@ -67,8 +70,16 @@ export default function Signup() {
             setPassword(e.target.value)
         }}/>
       </div>
+      <div className="flex flex-col">
+      <label htmlFor="name">Full name:</label>
+      <input type="text" name="name" id="name" placeholder="William Wordsworth"  className="w-[90%] my-4 h-10 rounded-sm p-2 mx-auto border-b-2 border-solid bg-[#F5F5F5]"
+        value={Name}
+        onChange={(e)=>{
+            setFullName(e.target.value)
+        }}/>
+      </div>
       <div className="w-full h-10 text-red-500">{error}</div>
-      <a href="/auth/login" className="h-10 ">Already have an account? <span className="text-blue-600">Login</span></a>
+      <Link to="/auth/login" className="h-10 ">Already have an account? <span className="text-blue-600">Login</span></Link>
       <div className="flex items-center justify-center my-3">
 <button
   type="submit"
