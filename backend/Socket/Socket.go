@@ -16,6 +16,7 @@ type Message struct {
 	Sender   string `json:"sender"`
 	Reciever string `json:"reciever"`
 	Message  string `json:"message"`
+	DeleteID int    `json:"deleteID"`
 }
 type MessageResponse struct {
 	Sender   string `json:"sender"`
@@ -73,15 +74,34 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 		sender = messageData.Sender
 		receiver := messageData.Reciever
 		msg1 := messageData.Message
+		deleteID := messageData.DeleteID
+
 		Connections[sender] = conn
 		fmt.Println("Message received from", sender, ":", string(msg1))
 		if receiver == "" {
 			fmt.Println("Receiver is empty, skipping message")
 			continue
 		}
+		if deleteID > 0 {
+			type Delete struct {
+				DeleteID int `json:"deleteId"`
+			}
+			var response Delete
+			response.DeleteID = deleteID
+			responseBytes, err := json.Marshal(response)
+			if err != nil {
+				continue
+			}
+			fmt.Println("Deleting message")
+			SendMessage(receiver, responseBytes)
+			SendMessage(sender, responseBytes)
+			continue
+		}
+		if msg1 == "" {
+			continue
+		}
 		stmt, err := DB.Prepare("INSERT INTO messages (sender, receiver, message) VALUES (?, ?, ?)")
 		if err != nil {
-			fmt.Println("Error inserting message into database:", err)
 			errMsg := fmt.Sprintf("Failed to insert message into database: %v", err)
 			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 			conn.Close()

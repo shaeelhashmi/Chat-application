@@ -24,7 +24,21 @@ const reciever = params.id || "";
 const [Messages, setMessages] = useState("")
 
 const onDelete = (id: number) => {
-  props.setMessagesList((prevMessages:any) => prevMessages?.filter((message:any) => message.id !== id) || []);
+   if(!props.socketRef.current) {
+       throw "Websocket is not initialized"
+    }
+    if (props.socketRef.current && props.socketRef.current.readyState === WebSocket.OPEN) {
+        const messageData = JSON.stringify({
+            sender: user,
+            reciever: reciever,
+            message: "",
+            deleteID: id,
+            });
+        props.socketRef.current.send(messageData);
+        setMessages("");
+    } else {
+        console.error("WebSocket is not open");
+    }
 }
 const recieveMessages= async ()=>{
   try {
@@ -57,6 +71,7 @@ const sendMessage = async() => {
             sender: user,
             reciever: reciever,
             message: Messages,
+            deleteID: -1
             });
         props.socketRef.current.send(messageData);
         setMessages("");

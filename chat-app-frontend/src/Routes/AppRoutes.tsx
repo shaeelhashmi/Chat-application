@@ -42,7 +42,12 @@ export default function AppRoutes() {
             
             
             let parsedData = JSON.parse(event.data)
-            console.log(parsedData)
+             console.log(parsedData)
+            if (parsedData.deleteId)
+            {           
+                setMessagesList(prevMessages => prevMessages?.filter(message => message.id !== parsedData.deleteId) || []);
+                return;
+            }
             if (!parsedData.toSender)
             {
             new Notification('Message recieved', {
@@ -65,6 +70,8 @@ export default function AppRoutes() {
             sender: user,
             reciever: "",
             message: "Test message from socket",
+             deleteID: -1,
+            
           });
           console.log("Sending test message:", testMessage);
           socket.send(testMessage);
