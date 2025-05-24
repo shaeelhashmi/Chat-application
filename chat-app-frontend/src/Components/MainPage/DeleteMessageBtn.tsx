@@ -24,8 +24,8 @@ export default function DeleteMessageBtn(props:prop) {
             </button>
             {
               
-            <div className={`relative bg-[#0b0b47] bottom-2 right-20  rounded-md text-center ${option?"opacity-100 w-[140px] h-[50px]":"opacity-0 w-0 h-0"} transition-all duration-500 origin-center`}>
-             <button className={`text-white text-sm font-light p-2 hover:bg-[#141474] rounded-md transition-all duration-500 ${option?"":"hidden"} `} onClick={handleDelete}>
+            <div className={`relative bg-[#c5ff9a] bottom-2 right-20  rounded-md text-center ${option?"opacity-100 w-[140px] h-[50px]":"opacity-0 w-0 h-0"} transition-all duration-500 origin-center`}>
+             <button className={`text-black text-sm font-light p-2 hover:bg-[#d7ffbb] w-full transition-all duration-500 ${option?"":"hidden"} h-full`} onClick={handleDelete}>
                 Delete message
             </button>
             

@@ -72,7 +72,7 @@ const sendMessage = async() => {
       {props.MessagesList?.map((message: any, index:number) => (
         <div key={index} className={`flex mt-4 ${message.sender == user ? "justify-end" : ""}`}>
           <div
-        className={`bg-[#cbcbff] text-black p-4 rounded-lg w-[50%] break-words whitespace-pre-wrap`}
+        className={`bg-[#dafdc0] text-black p-4 rounded-lg w-[50%] break-words whitespace-pre-wrap`}
         style={{ wordBreak: "break-word" }}
           >
         <div className="flex justify-between">
@@ -80,7 +80,7 @@ const sendMessage = async() => {
           <DeleteMessageBtn id={message.id} onDelete={onDelete} />
         </div>
         <div>
-          <p className="text-sm font-light text-end">{new Date(message.created_at).toLocaleString()}</p>
+          <p className="text-xs italic font-light text-end">{new Date(message.created_at).toLocaleString()}</p>
         </div>
           </div>
         </div>
@@ -103,7 +103,7 @@ const sendMessage = async() => {
         />
         </div >
         <div className=" border-none items-center content-center flex justify-center ">
-        <button className={` bg-white hover:bg-[#e2e1e1] transition-all p-3 rounded-md duration-500 ${Messages.trim()==""?" hidden":""}`} onClick={sendMessage}><SendMsg></SendMsg></button>
+        <button className={` bg-[#d7ffb6] hover:bg-[#c3ff92] transition-all p-3 rounded-md duration-500 ${Messages.trim()==""?" hidden":""}`} onClick={sendMessage}><SendMsg></SendMsg></button>
         </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import FriendPopup from "./Popups/FriendPopup";
 import { Link } from "react-router-dom";
 import {useSelector} from "react-redux";
-import Hamburger from "../SVG/Hamburger";
+import { Menu } from 'lucide-react';
 import { useDispatch } from "react-redux";
 import { setSidebar } from "../Slice/SideBar";
 import { setSettingsidebar } from "../Slice/SettingSidebar";
@@ -47,7 +47,7 @@ export default function Navbar(props: NavbarProps) {
           }
           dispatch(setSidebar())
           }}>
-          <Hamburger />
+          <Menu className="lg:hidden block"/>
         </button>
         <div className="flex items-center justify-center">
         <h1 className="text-black lg:text-xl font-bold text-[0.8rem] xxs:text-lg">{user}</h1>

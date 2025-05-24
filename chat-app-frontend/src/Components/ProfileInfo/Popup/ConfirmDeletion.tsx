@@ -15,7 +15,9 @@ export default function ConfirmDeletion(props:{secondPopup:boolean
              await axios.post("http://localhost:8080/user/delete", { password }, { withCredentials: true })
             location.reload();
         }catch(error:any) {
-            console.log(error)
+            if (error.response.status==401){
+                setError("Incorrect Password")
+            }
         }
     }
   return (
