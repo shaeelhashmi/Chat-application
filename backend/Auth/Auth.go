@@ -33,6 +33,25 @@ func GenerateSessionID(userName string) string {
 	sessionID = userName + sessionID
 	return sessionID
 }
+func ComparePasswords(username string, password string, DB *sql.DB, w *http.ResponseWriter) bool {
+	var dbUser User
+	var dbSalt []byte
+	err := DB.QueryRow("SELECT username, password, salt FROM users WHERE username=?", username).Scan(&dbUser.Username, &dbUser.Password, &dbSalt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(*w, "Invalid username or password", http.StatusUnauthorized)
+			return false
+		}
+		utils.HandleError(*w, err, "Failed to query user", http.StatusInternalServerError)
+		return false
+	}
+	hashedPassword := HashPassword(password, dbSalt)
+	if hashedPassword != dbUser.Password {
+		http.Error(*w, "Invalid username or password", http.StatusUnauthorized)
+		return false
+	}
+	return true
+}
 func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, DB *sql.DB) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -54,23 +73,28 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, 
 	if utils.HandleError(w, err, "Failed to get session", http.StatusInternalServerError) {
 		return
 	}
-	var dbUser User
-	var dbSalt []byte
-	err = DB.QueryRow("SELECT username, password, salt FROM users WHERE username=?", user.Username).Scan(&dbUser.Username, &dbUser.Password, &dbSalt)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
-		} else {
-			utils.HandleError(w, err, "Failed to query user", http.StatusInternalServerError)
+	fmt.Println(user.Username, user.Password)
+	compare := ComparePasswords(user.Username, user.Password, DB, &w)
+	if !compare {
+		return
+	}
+	// var dbUser User
+	// var dbSalt []byte
+	// err = DB.QueryRow("SELECT username, password, salt FROM users WHERE username=?", user.Username).Scan(&dbUser.Username, &dbUser.Password, &dbSalt)
+	// if err != nil {
+	// 	if err == sql.ErrNoRows {
+	// 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+	// 	} else {
+	// 		utils.HandleError(w, err, "Failed to query user", http.StatusInternalServerError)
 
-		}
-		return
-	}
-	hashedPassword := HashPassword(user.Password, dbSalt)
-	if hashedPassword != dbUser.Password {
-		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
-		return
-	}
+	// 	}
+	// 	return
+	// }
+	// hashedPassword := HashPassword(user.Password, dbSalt)
+	// if hashedPassword != dbUser.Password {
+	// 	http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+	// 	return
+	// }
 	session.Values["username"] = user.Username
 	tx, err := DB.Begin()
 	if utils.HandleError(w, err, "Failed to begin transaction", http.StatusInternalServerError) {

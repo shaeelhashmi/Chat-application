@@ -93,3 +93,29 @@ func ChangePassword(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Password updated successfully"))
 }
+func DeleteAccount(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
+	username, err := utils.GiveUserName(store, r)
+	if err != nil {
+		if err.Error() == "userName not found in session" {
+			http.Error(w, "User not logged in", http.StatusUnauthorized)
+			return
+		}
+		utils.HandleError(w, err, "Failed to get username from session", http.StatusInternalServerError)
+		return
+	}
+	_, err = DB.Exec("DELETE FROM users WHERE username=?", username)
+	if utils.HandleError(w, err, "Failed to delete user", http.StatusInternalServerError) {
+		return
+	}
+	_, err = DB.Exec("DELETE FROM sessions WHERE username=?", username)
+	if utils.HandleError(w, err, "Failed to delete user sessions", http.StatusInternalServerError) {
+
+		return
+	}
+	var userID int
+	err = DB.QueryRow("SELECT id FROM users WHERE username=?", username).Scan(&userID)
+	if utils.HandleError(w, err, "Failed to get user ID", http.StatusInternalServerError) {
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}

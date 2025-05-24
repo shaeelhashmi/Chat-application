@@ -19,6 +19,7 @@ import FriendSetting from '../Components/Friends/FriendSetting';
 import BlockedUser from '../Components/Blocked/BlockedUser';
 import Activitylog from '../Components/Settings/Activity/Activitylog';
 import PageDistribution from '../Components/Util/PageDistribution';
+import Profile from '../Components/ProfileInfo/Profile';
 interface Message {
   sender: string;
   reciever: string;
@@ -266,6 +267,15 @@ export default function AppRoutes() {
                 </>}/>
         </>
         } />
+        <Route path='/settings/info' element={
+          <>
+          <Navbar users={users}/>   
+              <PageDistribution text={<>
+                      <SettingSideBar />
+              <Profile ></Profile>
+                </>}/>
+          </>
+        }/>
 
       </Routes>
     );

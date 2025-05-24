@@ -108,6 +108,9 @@ func main() {
 	http.HandleFunc("/user/info", func(w http.ResponseWriter, r *http.Request) {
 		apis.UserInfo(w, r, DB, store)
 	})
+	http.HandleFunc("/user/delete", func(w http.ResponseWriter, r *http.Request) {
+		Settings.DeleteAccount(w, r, DB, store)
+	})
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")

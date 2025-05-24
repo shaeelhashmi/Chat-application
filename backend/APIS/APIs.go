@@ -392,10 +392,22 @@ func UserInfo(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *session
 		return
 	}
 	type data struct {
-		Fullname string `json:"fullname"`
+		Fullname     string `json:"fullname"`
+		TotalFriends int    `json:"totalFriends"`
+		TotalBlocked int    `json:"totalBlocked"`
 	}
 	var userData data
-	err = DB.QueryRow("SELECT fullname FROM users WHERE username = ?", username).Scan(&userData.Fullname)
+	var userID int
+	err = DB.QueryRow("SELECT fullname,id FROM users WHERE username = ?", username).Scan(&userData.Fullname, &userID)
+	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+
+	err = DB.QueryRow("SELECT COUNT(*) FROM friends WHERE friend1=? OR friend2=?", userID, userID).Scan(&userData.TotalFriends)
+	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+	err = DB.QueryRow("SELECT COUNT(*) FROM blocked_users WHERE blocked_by=? OR blocked=?", userID, userID).Scan(&userData.TotalBlocked)
 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
 		return
 	}
