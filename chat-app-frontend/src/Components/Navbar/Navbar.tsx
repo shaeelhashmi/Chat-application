@@ -36,7 +36,7 @@ export default function Navbar(props: NavbarProps) {
       setUser(selector.userName)
     },[selector])
   return (
-    <nav className="fixed top-0 w-screen   bg-[#d3d3ff] grid  z-50  xsm:grid-cols-[30%,1fr,5%] grid-cols-[40%,1fr,5%] md:grid-cols-[20%,1fr,5%]">
+    <nav className="fixed top-0 w-screen   bg-[#dafdc0] grid  z-50  xsm:grid-cols-[30%,1fr,5%] grid-cols-[40%,1fr,5%] md:grid-cols-[20%,1fr,5%]">
       {showPopup && <FriendPopup users={props.users} setState={setShowPopup}/>}
 
       <div className=" lg:pr-10 pr-2 flex flex-row xxs:gap-2 gap-0">
@@ -56,17 +56,17 @@ export default function Navbar(props: NavbarProps) {
       </div>
       <div className="w-full pr-10  flex justify-center items-start sm:gap-20 xsm:gap-10 gap-2">
         <div>
-        <Link to="/chat" className="mx-3 " onClick={()=>setIsSetting(false)}><ToolTipbtn text={<House className="sm:w-[24px] w-[15px]"/>} info="Home"/></Link>
+        <Link to="/chat" className="mx-3 " onClick={()=>setIsSetting(false)}><ToolTipbtn text={<House className="sm:w-[24px] w-[15px]"/>} bg="bg-[#c3ff92]" info="Home"/></Link>
         </div>
         <div>
-        <Link to="/requests/recieved" className=" mx-3 " onClick={()=>setIsSetting(false)}><ToolTipbtn text={<UserCheck className="sm:w-[24px] w-[15px]"/>} info="Recieved requests"/></Link>
+        <a href="/requests/recieved" className=" mx-3 " onClick={()=>setIsSetting(false)}><ToolTipbtn bg="bg-[#c3ff92]" text={<UserCheck className="sm:w-[24px] w-[15px]"/>} info="Recieved requests"/></a>
         </div>
         <div>
-        <Link to="/requests/sent" className=" mx-3" onClick={()=>setIsSetting(false)}>
-        <ToolTipbtn text={<ArrowUpRight className="sm:w-[24px] w-[15px] "/>} info="Sent requests"/></Link>
+        <a href="/requests/sent" className=" mx-3" onClick={()=>setIsSetting(false)}>
+        <ToolTipbtn bg="bg-[#c3ff92]" text={<ArrowUpRight className="sm:w-[24px] w-[15px] "/>} info="Sent requests"/></a>
         </div>
         <div>
-        <Link to="/settings" className=" mx-3 " onClick={()=>setIsSetting(true)}><ToolTipbtn text={<Settings className="sm:w-[24px] w-[15px]"/>} info="Settings"/></Link>
+        <Link to="/settings" className=" mx-3 " onClick={()=>setIsSetting(true)}><ToolTipbtn bg="bg-[#c3ff92]" text={<Settings className="sm:w-[24px] w-[15px]"/>} info="Settings"/></Link>
         </div>
       </div>
        <div className="flex justify-end w-full ">
@@ -78,11 +78,11 @@ export default function Navbar(props: NavbarProps) {
           </div>
     
         <div className={` ${options?"scale-100":"scale-0"} transition-all duration-500 absolute top-10 right-2 origin-top-right `}>
-        <div className="py-4  flex flex-col items-center justify-center relative top-2  sm:w-[200px] w-[100px] bg-[#bdbdf9] text-[0.6rem] sm:text-[0.7rem] lg:text-sm">
-          <div className="w-full"><button className="border-b-2 border-white w-full my-2 py-3 hover:bg-[#a3a3ff] duration-500 transition-all" onClick={()=>{
+        <div className="py-4  flex flex-col items-center justify-center relative top-2  sm:w-[200px] w-[100px] bg-[#dafdc0] lg:text-sm">
+          <div className="w-full"><button className="border-b-2 border-white w-full my-2 py-3 hover:bg-[#e6fdd1] duration-500 transition-all" onClick={()=>{
           setShowPopup(!showPopup)
         }}>Add friends</button></div>
-          <div className="w-full">  <button className="border-b-2 border-white w-full my-2 py-3 hover:bg-[#a3a3ff] duration-500 transition-all" onClick={() => {
+          <div className="w-full">  <button className="border-b-2 border-white w-full my-2 py-3 hover:bg-[#e6fdd1] duration-500 transition-all" onClick={() => {
             axios.get("http://localhost:8080/auth/logout", { withCredentials: true })
                 .then(() => navigate("/auth/login"))
                 .catch((err) => console.error("Logout error:", err));
