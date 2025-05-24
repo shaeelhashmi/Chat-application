@@ -22,7 +22,7 @@ export default function ChatSideBar(props: ChatSideBarProps) {
     <div>
       {selector.open && <Coverpage />}
 
-    <aside className={`lg:w-1/5 sm:w-[70%] bg-[#dafdc0] p-4  xsm:w-[80%] w-[90%]  h-screen fixed left-0 mx-0 overflow-y-auto  ${selector.open ?"scale-100":"scale-0"} transition-all duration-500 ease-in-out origin-top-left z-40 overflow-hidden`}>
+    <aside className={`lg:w-1/5 sm:w-[70%] bg-[#dafdc0] p-4  xsm:w-[80%] w-[90%]  h-screen fixed left-0 mx-0 overflow-y-auto  ${selector.open ?"scale-100":"scale-0"} transition-all duration-500 ease-in-out origin-top-left z-10 overflow-hidden`}>
         <div className="mt-16">
       {props.users?.map((user, index) => (
         <div key={index} className="grid items-center cursor-pointer grid-cols-[90%,10%] gap-2 my-4">

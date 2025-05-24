@@ -36,7 +36,7 @@ export default function Navbar(props: NavbarProps) {
       setUser(selector.userName)
     },[selector])
   return (
-    <nav className="fixed top-0 w-screen   bg-[#dafdc0] grid  z-50  xsm:grid-cols-[30%,1fr,5%] grid-cols-[40%,1fr,5%] md:grid-cols-[20%,1fr,5%]">
+    <nav className="fixed top-0 w-screen   bg-[#dafdc0] grid  z-20  xsm:grid-cols-[30%,1fr,5%] grid-cols-[40%,1fr,5%] md:grid-cols-[20%,1fr,5%]">
       {showPopup && <FriendPopup users={props.users} setState={setShowPopup}/>}
 
       <div className=" lg:pr-10 pr-2 flex flex-row xxs:gap-2 gap-0">
