@@ -40,7 +40,7 @@ export default function BlockedUser() {
   }}
   element={{id:+user.id,text:user.username,created_at:user.created_at}}
   buttonText="Unblock user"
-  buttonColor="bg-green-400"
+  buttonColor="bg-green-300 hover:bg-green-400 transition duration-500 ease-in-out"
   dateRepresentation="Blocked on: "
   />
  

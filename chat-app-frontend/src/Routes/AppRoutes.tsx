@@ -7,7 +7,7 @@ import Login    from '../Components/Auth/Login';
 import Signup from '../Components/Auth/Signup';
 import Navbar from '../Components/Navbar/Navbar';
 import SentRequest from '../Components/Requests/SentRequest';
-import ChatSideBar from '../Components/MainPage/ChatSideBar';
+import ChatSidebar from '../Components/MainPage/ChatSidebar';
 import MessageBody from '../Components/MainPage/MessageBody';
 import HomePage from '../Components/MainPage/HomePage';
 import RecievedRequest from '../Components/Requests/RecievedRequest';
@@ -111,6 +111,28 @@ export default function AppRoutes() {
       
       }
     };
+     const RemoveFriend=async(id:string|undefined,name:string|undefined)=>{
+    try {
+      const response = await axios.delete(`http://localhost:8080/friend/remove?friendid=${id}&friendname=${name}`, {withCredentials:true});
+      console.log(response.data);
+    }
+    catch (error) {
+      console.error("Error removing friend:", error);
+    }
+  }
+  const handleBlock=async(id:string|undefined,name:string|undefined)=>{
+    try {
+      if (!id || !name) {
+        console.error("Invalid id or name for blocking friend");
+        return;
+      }
+      const response = await axios.get(`http://localhost:8080/block?friendship_id=${id}&friend_name=${name}`, {withCredentials:true});
+      console.log(response.data);
+    }
+    catch (error) {
+      console.error("Error blocking friend:", error);
+    }
+  }
     useEffect(() => {
         
       
@@ -148,7 +170,7 @@ export default function AppRoutes() {
         <Navbar users={users}/>
         <PageDistribution  text={
           <> 
-        <ChatSideBar users={friends}/>
+        <ChatSidebar removeFriend={RemoveFriend} handleBlock={handleBlock} users={friends}/>
         <SentRequest  ></SentRequest>
         </>}
         />
@@ -197,7 +219,7 @@ export default function AppRoutes() {
         <Navbar users={users}/>     
         <PageDistribution text={
           <>
-          <ChatSideBar users={friends}/>
+          <ChatSidebar removeFriend={RemoveFriend} handleBlock={handleBlock} users={friends}/>
         <MessageBody  setMessagesList={setMessagesList} MessagesList={MessagesList} socketRef={socketRef}></MessageBody></>
         } />
 
@@ -206,7 +228,7 @@ export default function AppRoutes() {
         <>
         <Navbar users={users}/>   
         <PageDistribution text={<>
-            <ChatSideBar users={friends}/>
+            <ChatSidebar removeFriend={RemoveFriend} handleBlock={handleBlock} users={friends}/>
         <HomePage  ></HomePage>
         </>}/>  
          </>} />
@@ -214,7 +236,7 @@ export default function AppRoutes() {
         <>
           <Navbar users={users}/>    
         <PageDistribution text={<>
-            <ChatSideBar users={friends}/>
+            <ChatSidebar removeFriend={RemoveFriend} handleBlock={handleBlock} users={friends}/>
         <RecievedRequest  ></RecievedRequest>
           </>}/>
        
@@ -224,8 +246,8 @@ export default function AppRoutes() {
         <>
         <Navbar users={users}/>
         <PageDistribution text={<>
-          <ChatSideBar users={friends}/>
-        <FriendSetting />
+          <ChatSidebar removeFriend={RemoveFriend} handleBlock={handleBlock} users={friends}/>
+        <FriendSetting handleBlock={handleBlock} removeFriend={RemoveFriend} />
         </>}/>
         </>} />
           <Route path='/settings/activity' element={
