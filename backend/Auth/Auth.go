@@ -78,23 +78,6 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, 
 	if !compare {
 		return
 	}
-	// var dbUser User
-	// var dbSalt []byte
-	// err = DB.QueryRow("SELECT username, password, salt FROM users WHERE username=?", user.Username).Scan(&dbUser.Username, &dbUser.Password, &dbSalt)
-	// if err != nil {
-	// 	if err == sql.ErrNoRows {
-	// 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
-	// 	} else {
-	// 		utils.HandleError(w, err, "Failed to query user", http.StatusInternalServerError)
-
-	// 	}
-	// 	return
-	// }
-	// hashedPassword := HashPassword(user.Password, dbSalt)
-	// if hashedPassword != dbUser.Password {
-	// 	http.Error(w, "Invalid username or password", http.StatusUnauthorized)
-	// 	return
-	// }
 	session.Values["username"] = user.Username
 	tx, err := DB.Begin()
 	if utils.HandleError(w, err, "Failed to begin transaction", http.StatusInternalServerError) {

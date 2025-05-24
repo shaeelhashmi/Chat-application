@@ -3,11 +3,13 @@ import {  useEffect,useState } from "react"
 import { useSelector } from "react-redux"
 import WarningBox from "./Popup/WarningBox"
 import Coverpage from "../Coverpage"
+import ConfirmDeletion from "./Popup/ConfirmDeletion"
 export default function Profile() {
     const [fullName, setFullName] = useState<string>("")
     const [friend,setFriend] = useState<number>(0)
     const [blocked,setBlocked] = useState<number>(0)
     const [Popup,setPopup] = useState<boolean>(false)
+    const [secondPopup,setSecondPopup] = useState<boolean>(false)
     const selector = useSelector((state: any) => state.userName)
     
     useEffect(() => {
@@ -41,8 +43,9 @@ export default function Profile() {
         Please ensure you have saved any important data before proceeding.
       </p>
       </div>
-      {Popup && <Coverpage isMedia={true}></Coverpage>}
-        <WarningBox popup={Popup} setPopup={setPopup}/>
+      {(Popup || secondPopup )&& <Coverpage isMedia={true}></Coverpage>}
+        <WarningBox popup={Popup} setPopup={setPopup} setSecondPopup={setSecondPopup}/>
+        <ConfirmDeletion secondPopup={secondPopup} setSecondPopup={setSecondPopup}></ConfirmDeletion>
     </div>
   )
 }

@@ -103,15 +103,38 @@ func DeleteAccount(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *se
 		utils.HandleError(w, err, "Failed to get username from session", http.StatusInternalServerError)
 		return
 	}
-	_, err = DB.Exec("DELETE FROM users WHERE username=?", username)
+	data, err := io.ReadAll(r.Body)
+	if utils.HandleError(w, err, "Failed to get data", http.StatusInternalServerError) {
+		return
+	}
+	type Data struct {
+		Password string `json:"password"`
+	}
+	var reqData Data
+	err = json.Unmarshal(data, &reqData)
+	if utils.HandleError(w, err, "Failed to unmarshal request body", http.StatusBadRequest) {
+		return
+	}
+	password := reqData.Password
+	if !Auth.ComparePasswords(username, password, DB, &w) {
+		return
+	}
+	tx, err := DB.Begin()
+	if utils.HandleError(w, err, "Failed to begin transaction", http.StatusInternalServerError) {
+		return
+	}
+	defer tx.Rollback()
+	_, err = tx.Exec("DELETE FROM users WHERE username=?", username)
 	if utils.HandleError(w, err, "Failed to delete user", http.StatusInternalServerError) {
 		return
 	}
-	_, err = DB.Exec("DELETE FROM sessions WHERE username=?", username)
+
+	_, err = tx.Exec("DELETE FROM sessions WHERE username=?", username)
 	if utils.HandleError(w, err, "Failed to delete user sessions", http.StatusInternalServerError) {
 
 		return
 	}
+	tx.Commit()
 	var userID int
 	err = DB.QueryRow("SELECT id FROM users WHERE username=?", username).Scan(&userID)
 	if utils.HandleError(w, err, "Failed to get user ID", http.StatusInternalServerError) {

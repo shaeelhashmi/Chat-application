@@ -2,6 +2,7 @@
 import { TriangleAlert } from 'lucide-react';
 export default function WarningBox(props:{popup:boolean
   setPopup: (value: boolean) => void
+  setSecondPopup: (value: boolean) => void
 }) {
   return (
     <div
@@ -12,7 +13,10 @@ export default function WarningBox(props:{popup:boolean
       <TriangleAlert className="text-red-500" size={48} />
       <h2 className="sm:text-2xl text-lg font-bold text-red-600">Warning</h2>
       <p>Are you sure you want to delete your account?</p>
-      <button className="bg-red-700 text-white hover:bg-red-600 p-2 sm:text-lg text-sm transition-all duration-500 rounded-md">
+      <button className="bg-red-700 text-white hover:bg-red-600 p-2 sm:text-lg text-sm transition-all duration-500 rounded-md" onClick={() => {
+        props.setPopup(false);
+        props.setSecondPopup(true)
+      }}>
         yes, delete my account
       </button>
       <button className="bg-gray-300 text-black hover:bg-gray-400 p-2 sm:text-lg text-sm transition-all duration-500 rounded-md" onClick={() => props.setPopup(false)}>
