@@ -11,13 +11,15 @@ export default function FriendSetting(props: props) {
   const { id, name } = useParams()
   const [user,setUser]=useState<string>("")
   const [found,setFound]=useState<boolean>(true)
+  const [fullName,setName]=useState<string>("")
   const selector=useSelector((state:any)=>state.userName)
   
   const {removeFriend, handleBlock } = props;
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        await axios.get(`http://localhost:8080/friend/exists?friend=${name}&friendid=${id}`, {withCredentials:true});
+        const response=await axios.get(`http://localhost:8080/friend/exists?friend=${name}&friendid=${id}`, {withCredentials:true});
+        setName(response.data)
       } catch (error) {
         setFound(false)
       }
@@ -41,7 +43,8 @@ export default function FriendSetting(props: props) {
       <h2 className="text-4xl text-center">Friend </h2>
       <div className="mx-10">
       <h2 className="text-2xl">Id information</h2>
-      <p className="text-md ">Name:{name}</p>
+      <p className="text-md ">username:{name}</p>
+      <p className="text-md ">Full name:{fullName}</p>
       <div className="flex gap-2 justify-center items-center mt-5 w-full">
       <button onClick={()=>removeFriend(id,name)} className="rounded-md bg-red-700 text-white px-4 py-2 hover:bg-red-600 transition duration-300">
         Unfriend

@@ -392,11 +392,10 @@ func UserInfo(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *session
 		return
 	}
 	type data struct {
-		Username string `json:"username"`
 		Fullname string `json:"fullname"`
 	}
 	var userData data
-	err = DB.QueryRow("SELECT username,fullname FROM users WHERE username = ?", username).Scan(&userData.Username, &userData.Fullname)
+	err = DB.QueryRow("SELECT fullname FROM users WHERE username = ?", username).Scan(&userData.Fullname)
 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
 		return
 	}

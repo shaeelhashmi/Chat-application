@@ -10,6 +10,7 @@ import (
 )
 
 func Exists(w http.ResponseWriter, r *http.Request, db *sql.DB, store *sessions.CookieStore) {
+	fmt.Println("Checking if friendship exists")
 	session, err := store.Get(r, "Login-session")
 	if utils.HandleError(w, err, "Error getting session", http.StatusInternalServerError) {
 		return
@@ -30,9 +31,7 @@ func Exists(w http.ResponseWriter, r *http.Request, db *sql.DB, store *sessions.
 		return
 	}
 	friendShipID := r.URL.Query().Get("friendid")
-	fmt.Println(friendShipID)
 	if friendShipID == "" {
-
 		http.Error(w, "Friend ID not provided", http.StatusBadRequest)
 		return
 	}
@@ -42,48 +41,15 @@ func Exists(w http.ResponseWriter, r *http.Request, db *sql.DB, store *sessions.
 		return
 	}
 	if exists {
+		var FriendFullName string
+		err = db.QueryRow("SELECT fullName FROM users WHERE username=?", friendUsername).Scan(&FriendFullName)
+		if utils.HandleError(w, err, "Error getting friend full name", http.StatusInternalServerError) {
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Friendship exists"))
+		w.Write([]byte(FriendFullName))
 		return
 	}
-
-	var userID int
-
-	err = db.QueryRow("SELECT id FROM users WHERE username=?", username).Scan(&userID)
-	if utils.HandleError(w, err, "Error checking if friend exists", http.StatusInternalServerError) {
-		return
-	}
-	var friendID int
-	err = db.QueryRow("SELECT id FROM users WHERE username=?", friendUsername).Scan(&friendID)
-	if utils.HandleError(w, err, "Error checking if friend exists", http.StatusInternalServerError) {
-		return
-	}
-	exists, err = CheckFriendShip(db, userID, friendID)
-	if utils.HandleError(w, err, "Error checking if friend exists", http.StatusInternalServerError) {
-		return
-	}
-	if !exists {
-		http.Error(w, "Friendship does not exist", http.StatusNotFound)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Friendship exists"))
-}
-func CheckFriendShip(db *sql.DB, friend1 int, friend2 int) (bool, error) {
-	var exists bool
-	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM friends WHERE Friend1 = ? AND Friend2 = ?)", friend1, friend2).Scan(&exists)
-	if err != nil {
-		return false, err
-	}
-	if exists {
-		return true, nil
-	}
-	err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM friends WHERE Friend2 = ? AND Friend1 = ?)", friend2, friend1).Scan(&exists)
-	if err != nil {
-		return false, err
-	}
-	if exists {
-		return true, nil
-	}
-	return false, nil
+	http.Error(w, "Friendship does not exist", http.StatusNotFound)
 }
