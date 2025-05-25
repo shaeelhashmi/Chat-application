@@ -23,7 +23,7 @@ export default function MessageBody(props:prop) {
   const params = useParams<{ id?: string }>();
 const reciever = params.id || "";
 const [Messages, setMessages] = useState("")
-
+const [length, setLength] = useState(0);
 const onDelete = (id: number) => {
    if(!props.socketRef.current) {
        throw "Websocket is not initialized"
@@ -54,7 +54,6 @@ const recieveMessages= async ()=>{
 
 
 useEffect(() => { 
-  console.log(params.id);
    (async () => {
     await recieveMessages();
     }
@@ -62,6 +61,18 @@ useEffect(() => {
     setUser(selector.userName)
     console.log(user)
 }, [selector]);
+useEffect(() => {
+  if (length !== props.MessagesList?.length && length!=0) {
+    const isAtBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 100;
+    console.log( window.innerHeight + window.scrollY, document.body.scrollHeight);
+    if (isAtBottom) {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
+    }
+    return
+  }
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
+  setLength(props.MessagesList?.length || 0);
+},[props.MessagesList]);
 
 const sendMessage = async() => {
     if(!props.socketRef.current) {
@@ -93,7 +104,7 @@ const sendMessage = async() => {
           >
         <div className="flex justify-between">
           <p className="break-words whitespace-pre-wrap">{message.message}</p>
-          <DeleteMessageBtn id={message.id} onDelete={onDelete} />
+         {message.sender == user &&  <DeleteMessageBtn id={message.id} onDelete={onDelete} />}
         </div>
         <div>
           <p className="text-xs italic font-light text-end">{new Date(message.created_at).toLocaleString()}</p>

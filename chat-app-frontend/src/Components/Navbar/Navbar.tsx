@@ -1,5 +1,5 @@
 import axios from "axios";
-import Elipsis from "../SVG/Elipsis";
+import { Ellipsis } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import FriendPopup from "./Popups/FriendPopup";
@@ -72,8 +72,8 @@ export default function Navbar(props: NavbarProps) {
        <div className="flex justify-end w-full ">
         <div>
           <div className="items-center justify-center flex relative top-7">
-          <button onClick={()=>setOptions(!options)} className="xsm:mr-3 mr-1">
-                <Elipsis/>
+          <button onClick={()=>setOptions(!options)} className="xsm:mr-3 mr-1 relative right-5">
+                <Ellipsis/>
           </button>
           </div>
     
