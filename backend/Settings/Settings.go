@@ -142,3 +142,29 @@ func DeleteAccount(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *se
 	}
 	w.WriteHeader(http.StatusOK)
 }
+func ChangeFullName(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
+	var fullName string
+	data, err := io.ReadAll(r.Body)
+	if utils.HandleError(w, err, "Failed to read request body", http.StatusBadRequest) {
+		return
+	}
+	err = json.Unmarshal(data, &fullName)
+	if utils.HandleError(w, err, "Failed to unmarshal request body", http.StatusBadRequest) {
+		return
+	}
+	userName, err := utils.GiveUserName(store, r)
+	if err != nil {
+		if err.Error() == "userName not found in session" {
+			http.Error(w, "User not logged in", http.StatusUnauthorized)
+			return
+		}
+		utils.HandleError(w, err, "Failed to get username from session", http.StatusInternalServerError)
+		return
+	}
+	err = DB.QueryRow("UPDATE users SET fullname=? WHERE username=?", fullName, userName).Err()
+	if utils.HandleError(w, err, "Failed to update fullname", http.StatusInternalServerError) {
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Fullname updated successfully"))
+}

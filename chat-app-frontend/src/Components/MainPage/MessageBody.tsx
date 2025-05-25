@@ -101,7 +101,7 @@ const sendMessage = async() => {
         </div>
       ))}
 
-      <div className="fixed bottom-0 w-[75%]">
+      <div className="fixed bottom-0 lg:w-[75%] w-[80%] mx-auto">
         <div className="grid grid-cols-[1fr,5%] bg-white ">
         <div>
         <textarea
@@ -118,7 +118,7 @@ const sendMessage = async() => {
         />
         </div >
         <div className=" border-none items-center content-center flex justify-center ">
-        <button className={` bg-[#d7ffb6] hover:bg-[#c3ff92] transition-all p-3 rounded-md duration-500 ${Messages.trim()==""?" hidden":""}`} onClick={sendMessage}><SendMsg></SendMsg></button>
+        <button className={` bg-[#d7ffb6] hover:bg-[#c3ff92] transition-all  p-4 rounded-md duration-500 ${Messages.trim()==""?" hidden":""} relative left-5`} onClick={sendMessage}><SendMsg></SendMsg></button>
         </div>
         </div>
       </div>

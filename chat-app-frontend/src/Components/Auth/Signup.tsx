@@ -51,7 +51,13 @@ export default function Signup() {
     <form action="" className="p-3 max-w-[500px] min-w-[200px]  w-[500px] xsm:text-md text-sm" onSubmit={handleSubmit} >
       <h1 className="xsm:text-3xl text-xl font-bold">Get started now</h1>
       <div className="my-3 font-semibold"><label htmlFor="name">Name</label></div>
-      <input type="text" className="border-2 border-solid w-full p-2 rounded-sm" placeholder="Enter your name" value={Name} onChange={(e) => setFullName(e.target.value)} id="name" />
+      <input type="text" className="border-2 border-solid w-full p-2 rounded-sm" placeholder="Enter your name" value={Name} onChange={(e) => {
+        if (e.target.value.length > 70) {
+            setError("Name must be less than 30 characters")
+            return
+        }
+        setFullName(e.target.value)
+        }} id="name" />
       <div className="my-3 font-semibold"><label htmlFor="username">Username</label></div>
       <input type="text" className="border-2 border-solid w-full p-2 rounded-sm" placeholder="Enter your username" value={username} onChange={(e) =>{
             const value = e.target.value.replace(/\W/g, '')

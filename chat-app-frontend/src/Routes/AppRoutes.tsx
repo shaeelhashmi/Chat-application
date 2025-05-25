@@ -20,6 +20,7 @@ import BlockedUser from '../Components/Blocked/BlockedUser';
 import Activitylog from '../Components/Settings/Activity/Activitylog';
 import PageDistribution from '../Components/Util/PageDistribution';
 import Profile from '../Components/ProfileInfo/Profile';
+import ChangeFullName from '../Components/Settings/ChangeFullName';
 interface Message {
   sender: string;
   reciever: string;
@@ -280,6 +281,15 @@ export default function AppRoutes() {
               <PageDistribution text={<>
                       <SettingSideBar />
               <Profile ></Profile>
+                </>}/>
+          </>
+        }/>
+         <Route path='/settings/fullname' element={
+          <>
+          <Navbar users={users}/>   
+              <PageDistribution text={<>
+                      <SettingSideBar />
+              <ChangeFullName ></ChangeFullName>
                 </>}/>
           </>
         }/>

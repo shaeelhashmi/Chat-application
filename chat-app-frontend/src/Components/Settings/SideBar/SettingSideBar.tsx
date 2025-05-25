@@ -29,6 +29,11 @@ export default function SettingSideBar() {
           <div  className="flex items-center cursor-pointer my-2">
           <Link className="text-black p-4  hover:bg-[#e6fdd1] text-start border-[#ffffff] border-b-2  transition-all duration-500 py-2 w-full" to='/settings/info'>Profile info</Link>
           </div>
+          <div  className="flex items-center cursor-pointer my-2">
+          <Link className="text-black p-4  hover:bg-[#e6fdd1] text-start border-[#ffffff] border-b-2  transition-all duration-500 py-2 w-full" to='/settings/fullname'>Change full name</Link>
+          </div>
+          
+
         
         
       </div>

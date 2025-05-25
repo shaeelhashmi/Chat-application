@@ -72,7 +72,6 @@ func main() {
 		apis.BlockedUsers(w, r, DB, store)
 	})
 	http.HandleFunc("/delete/request", func(w http.ResponseWriter, r *http.Request) {
-
 		delete.DeleteReceivedRequest(w, r, DB, store)
 	})
 	http.HandleFunc("/delete/sentrequest", func(w http.ResponseWriter, r *http.Request) {
@@ -110,6 +109,9 @@ func main() {
 	})
 	http.HandleFunc("/user/delete", func(w http.ResponseWriter, r *http.Request) {
 		Settings.DeleteAccount(w, r, DB, store)
+	})
+	http.HandleFunc("/user/name", func(w http.ResponseWriter, r *http.Request) {
+		Settings.ChangeFullName(w, r, DB, store)
 	})
 	err := godotenv.Load()
 	if err != nil {
