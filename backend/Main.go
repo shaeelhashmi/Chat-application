@@ -110,6 +110,9 @@ func main() {
 	http.HandleFunc("/user/delete", func(w http.ResponseWriter, r *http.Request) {
 		Settings.DeleteAccount(w, r, DB, store)
 	})
+	http.HandleFunc("/user/session", func(w http.ResponseWriter, r *http.Request) {
+		apis.GetSessionID(w, r, DB, store)
+	})
 	http.HandleFunc("/user/name", func(w http.ResponseWriter, r *http.Request) {
 		Settings.ChangeFullName(w, r, DB, store)
 	})

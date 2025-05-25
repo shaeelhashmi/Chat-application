@@ -35,7 +35,16 @@ export default function AppRoutes() {
 
    /*For sockets*/
    const [MessagesList, setMessagesList] = useState<Message[] | null>([]);
-   const [user,setUser]=useState<string>("")
+   const [sessionID,setSessionId]=useState<string>("")
+   const getSessionID=async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/user/session", { withCredentials: true });
+      console.log("Session ID:", response);
+      setSessionId(response.data.sessionID);
+    } catch (error) {
+      console.error("Error fetching session ID:", error);
+    }
+   }
   const formConnection = async () => {
         const socket = new WebSocket(`ws://localhost:8080/`);
         socketRef.current = socket;
@@ -58,7 +67,8 @@ export default function AppRoutes() {
             setMessagesList(prevMessages => [...(prevMessages || []), parsedData]);
         });
     
-        socket.addEventListener("close", () => {
+        socket.addEventListener("close", (event) => {
+          console.log("WebSocket connection closed:", event);
             console.log("WebSocket disconnected");
         });
     
@@ -68,7 +78,7 @@ export default function AppRoutes() {
      
         socket.addEventListener("open", () => {
           const testMessage = JSON.stringify({
-            sender: user,
+            sender: sessionID,
             reciever: "",
             message: "Test message from socket",
              deleteID: -1,
@@ -100,7 +110,7 @@ export default function AppRoutes() {
       try {
           const response = await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
           dispatch(setUsername(response.data.user))
-          setUser(response.data.user)
+          
       } catch (error) {
           console.error("Error fetching user:", error);
       }
@@ -157,16 +167,17 @@ export default function AppRoutes() {
         fetchusers();
         fetchFriends();
         fetchUser();
+        getSessionID();
 
   
     }, []);
     useEffect(() => {
-      if(user=="")
-      {
-        return
+      if (!sessionID) {
+        return;
       }
+      
       formConnection()
-    },[user])
+    },[sessionID])
   
   
     return (
@@ -229,7 +240,7 @@ export default function AppRoutes() {
         <PageDistribution text={
           <>
           <ChatSidebar removeFriend={RemoveFriend} handleBlock={handleBlock} users={friends}/>
-        <MessageBody  setMessagesList={setMessagesList} MessagesList={MessagesList} socketRef={socketRef}></MessageBody></>
+        <MessageBody  setMessagesList={setMessagesList} MessagesList={MessagesList} socketRef={socketRef} sessionID={sessionID}></MessageBody></>
         } />
 
          </>} />

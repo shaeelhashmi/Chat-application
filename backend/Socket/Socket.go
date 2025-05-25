@@ -71,11 +71,18 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			fmt.Println("Invalid JSON format:", err)
 			continue
 		}
-		sender = messageData.Sender
+		sessionID := messageData.Sender
 		receiver := messageData.Reciever
 		msg1 := messageData.Message
 		deleteID := messageData.DeleteID
-
+		fmt.Println("Received message:", msg1, "from session ID:", sessionID, "to receiver:", receiver, "with delete ID:", deleteID)
+		err = DB.QueryRow("SELECT username FROM sessions WHERE sessionID = ?", sessionID).Scan(&sender)
+		if err != nil {
+			errMsg := fmt.Sprintf("Failed to fetch sender username: %v", err)
+			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
+			conn.Close()
+			return
+		}
 		Connections[sender] = conn
 		fmt.Println("Message received from", sender, ":", string(msg1))
 		if receiver == "" {
@@ -143,7 +150,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			return
 		}
 		response := MessageResponse{
-			messageData.Sender,
+			sender,
 			messageData.Reciever,
 			messageData.Message,
 			time.Now().Format("2006-01-02 15:04:05"),

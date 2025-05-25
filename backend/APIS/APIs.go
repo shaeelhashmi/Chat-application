@@ -414,3 +414,25 @@ func UserInfo(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *session
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userData)
 }
+func GetSessionID(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
+	userName, err := utils.GiveUserName(store, r)
+	if err != nil {
+		if err.Error() == "userName not found in session" {
+			utils.HandleError(w, err, "User not logged in", http.StatusUnauthorized)
+			return
+		}
+		utils.HandleError(w, err, "Failed to get username from session", http.StatusInternalServerError)
+		return
+	}
+	var sessionID string
+	err = DB.QueryRow("SELECT sessionID FROM sessions WHERE username = ?", userName).Scan(&sessionID)
+	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+	fmt.Println("Session ID for user", userName, "is", sessionID)
+	w.Header().Set("Content-Type", "application/json")
+	response := map[string]string{
+		"sessionID": sessionID,
+	}
+	json.NewEncoder(w).Encode(response)
+}

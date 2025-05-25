@@ -73,7 +73,6 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, 
 	if utils.HandleError(w, err, "Failed to get session", http.StatusInternalServerError) {
 		return
 	}
-	fmt.Println(user.Username, user.Password)
 	compare := ComparePasswords(user.Username, user.Password, DB, &w)
 	if !compare {
 		return
@@ -85,15 +84,17 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, 
 	}
 	defer tx.Rollback()
 	sessionID := GenerateSessionID(user.Username)
+
+	err = session.Save(r, w)
+	if utils.HandleError(w, err, "Failed to save session", http.StatusInternalServerError) {
+		return
+	}
+	fmt.Println("Session ID:", sessionID)
 	_, err = tx.Exec("INSERT INTO sessions (username, sessionID) VALUES (?, ?) ON DUPLICATE KEY UPDATE sessionID = VALUES(sessionID)", user.Username, sessionID)
 	if utils.HandleError(w, err, "Failed to insert session", http.StatusInternalServerError) {
 		return
 	}
-	err = session.Save(r, w)
-	fmt.Println("Session saved")
-	if utils.HandleError(w, err, "Failed to save session", http.StatusInternalServerError) {
-		return
-	}
+
 	err = tx.Commit()
 	if utils.HandleError(w, err, "Failed to commit transaction", http.StatusInternalServerError) {
 		return

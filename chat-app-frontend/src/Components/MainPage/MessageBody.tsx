@@ -15,6 +15,7 @@ interface prop{
   setMessagesList:React.Dispatch<React.SetStateAction<Message[] | null>>
   MessagesList:Message[] | null
   socketRef:React.RefObject<WebSocket|null>
+  sessionID:string
 }
 export default function MessageBody(props:prop) {
   const [user,setUser]=useState("")
@@ -29,7 +30,7 @@ const onDelete = (id: number) => {
     }
     if (props.socketRef.current && props.socketRef.current.readyState === WebSocket.OPEN) {
         const messageData = JSON.stringify({
-            sender: user,
+            sender: props.sessionID,
             reciever: reciever,
             message: "",
             deleteID: id,
@@ -68,7 +69,7 @@ const sendMessage = async() => {
     }
     if (props.socketRef.current && props.socketRef.current.readyState === WebSocket.OPEN) {
         const messageData = JSON.stringify({
-            sender: user,
+            sender: props.sessionID,
             reciever: reciever,
             message: Messages,
             deleteID: -1
