@@ -112,7 +112,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			errMsg := fmt.Sprintf("Failed to insert message into database: %v", err)
 			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 			conn.Close()
-			return
+			break
 		}
 		defer stmt.Close()
 		var SenderID int
@@ -122,7 +122,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			errMsg := fmt.Sprintf("Failed to fetch sender ID: %v", err)
 			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 			conn.Close()
-			return
+			break
 		}
 		var ReceiverID int
 		err = DB.QueryRow("SELECT id FROM users WHERE username = ?", receiver).Scan(&ReceiverID)
@@ -131,7 +131,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			errMsg := fmt.Sprintf("Failed to fetch receiver ID: %v", err)
 			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 			conn.Close()
-			return
+			break
 		}
 		result, err := stmt.Exec(SenderID, ReceiverID, msg1)
 		if err != nil {
@@ -139,7 +139,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			errMsg := fmt.Sprintf("Failed to execute statement: %v", err)
 			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 			conn.Close()
-			return
+			break
 		}
 		lastID, err := result.LastInsertId()
 		if err != nil {
@@ -147,7 +147,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			errMsg := fmt.Sprintf("Failed to get last insert ID: %v", err)
 			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 			conn.Close()
-			return
+			break
 		}
 		response := MessageResponse{
 			sender,
