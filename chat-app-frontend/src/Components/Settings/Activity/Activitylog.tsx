@@ -34,7 +34,7 @@ export default function Activitylog() {
           }catch (error){
 
           }
-          }} element={{id:item.id,text:item.activity,created_at:item.created_at}} buttonText="Delete activity" buttonColor=" bg-[rgb(116_185_62)]  hover:bg-[rgb(112_177_62)] "></TextBox>
+          }} element={{id:item.id,text:item.activity,created_at:item.created_at}} buttonText="Delete activity" buttonColor=" bg-[#004B61]  hover:bg-[#013C4E] "></TextBox>
 
         </>
       ))}

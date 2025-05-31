@@ -10,6 +10,8 @@ export default function ChangeFullName() {
       , {
         withCredentials: true
       })
+      setError('Full name changed successfully')
+      location.reload()
       } catch (err) {
         if (axios.isAxiosError(err)) {
           if (err.response) {

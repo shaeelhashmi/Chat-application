@@ -25,6 +25,7 @@ export default function ChangeUserName() {
 
             dispatch(setUsername(username))
             setError(response.data)
+            location.reload()
 
         } catch (error:any) {
           setError(error.response.data || 'An error occurred while changing the username')

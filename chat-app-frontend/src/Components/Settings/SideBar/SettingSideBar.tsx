@@ -17,14 +17,19 @@ export default function SettingSideBar() {
             }`}
             to='/settings/user'
             >
-            Change UserName
+            Change user name
             </Link>
         </div>
         <div  className="flex items-center cursor-pointer my-2">
           <Link className={`text-white p-4 hover:bg-[#212121] text-start transition-all duration-500 py-2 w-full ${
               window.location.pathname === "/settings/password" ? "bg-[#212121]" : ""
-            }`} to='/settings/password'>Change Password</Link>
+            }`} to='/settings/password'>Change password</Link>
         </div>
+            <div  className="flex items-center cursor-pointer my-2">
+          <Link className={`text-white p-4 hover:bg-[#212121] text-start transition-all duration-500 py-2 w-full ${
+              window.location.pathname === "/settings/fullname" ? "bg-[#212121]" : ""
+            }`} to='/settings/fullname'>Change full name</Link>
+          </div>
          <div  className="flex items-center cursor-pointer my-2">
           <Link className={`text-white p-4 hover:bg-[#212121] text-start transition-all duration-500 py-2 w-full ${
               window.location.pathname === "/settings/activity" ? "bg-[#212121]" : ""
@@ -33,18 +38,14 @@ export default function SettingSideBar() {
         <div  className="flex items-center cursor-pointer my-2">
           <Link className={`text-white p-4 hover:bg-[#212121] text-start transition-all duration-500 py-2 w-full ${
               window.location.pathname === "/settings/blocked" ? "bg-[#212121]" : ""
-            }`} to='/settings/blocked'>Blocked Users</Link>
+            }`} to='/settings/blocked'>Blocked users</Link>
           </div>
           <div  className="flex items-center cursor-pointer my-2">
           <Link className={`text-white p-4 hover:bg-[#212121] text-start transition-all duration-500 py-2 w-full ${
               window.location.pathname === "/settings/info" ? "bg-[#212121]" : ""
             }`} to='/settings/info'>Profile info</Link>
           </div>
-          <div  className="flex items-center cursor-pointer my-2">
-          <Link className={`text-white p-4 hover:bg-[#212121] text-start transition-all duration-500 py-2 w-full ${
-              window.location.pathname === "/settings/fullname" ? "bg-[#212121]" : ""
-            }`} to='/settings/fullname'>Change full name</Link>
-          </div>
+      
           
 
         

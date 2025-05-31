@@ -21,6 +21,7 @@ export default function ChangePassword() {
         { withCredentials: true }
       )
       setError(response.data)
+      location.reload()
     } catch (error) {
       setError("Internal server error")
       console.log(error)
