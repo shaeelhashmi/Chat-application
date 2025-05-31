@@ -103,7 +103,7 @@ const sendMessage = async() => {
    
     <div className=" h-full   mt-14 p-2 ml-[3%] w-full ">
       {props.MessagesList?.map((message: any, index:number) => (
-        <div key={index} className={`flex mt-4 ${message.sender == user ? "justify-end" : ""} `}>
+        <div key={index} className={`flex mt-4 ${message.sender == user ? "justify-end" : ""} sm:text-base xsm:text-sm text-xs`}>
           <div
         className={`bg-[#2C2C2C] text-[#FFF] p-4 rounded-lg w-[50%] break-words whitespace-pre-wrap`}
         style={{ wordBreak: "break-word" }}

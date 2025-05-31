@@ -20,7 +20,7 @@ export default function SettingSideBar() {
             Change user name
             </Link>
         </div>
-        <div  className="flex items-center cursor-pointer my-2">
+        <div  className="flex items-center cursor-pointer my-2 sm:text-base text-sm">
           <Link className={`text-white p-4 hover:bg-[#212121] text-start transition-all duration-500 py-2 w-full ${
               window.location.pathname === "/settings/password" ? "bg-[#212121]" : ""
             }`} to='/settings/password'>Change password</Link>
