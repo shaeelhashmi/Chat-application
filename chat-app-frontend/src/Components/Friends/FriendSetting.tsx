@@ -39,12 +39,12 @@ export default function FriendSetting(props: props) {
     <>
    {
     found ?
-    <div className="mt-20 text-black">
-      <h2 className="text-4xl text-center">Friend </h2>
+    <div className="mt-20 text-white sm:text-lg xsm:text-sm text-xs">
+      <h2 className="sm:text-5xl xsm:text-3xl text-xl text-center">Friend </h2>
       <div className="mx-10">
       <h2 className="text-2xl">Id information</h2>
-      <p className="text-md ">username:{name}</p>
-      <p className="text-md ">Full name:{fullName}</p>
+      <p className="my-3">username:{name}</p>
+      <p className="my-3">Full name:{fullName}</p>
       <div className="flex gap-2 justify-center items-center mt-5 w-full">
       <button onClick={()=>removeFriend(id,name)} className="rounded-md bg-red-700 text-white px-4 py-2 hover:bg-red-600 transition duration-300">
         Unfriend
