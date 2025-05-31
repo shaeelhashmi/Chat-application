@@ -7,7 +7,7 @@ export default function SettingSideBar() {
     <>
         <div>
            {selector.open && <Coverpage />}
-    <aside className={`lg:w-1/5 w-[90%] bg-black p-4  h-screen fixed left-0 mx-0 overflow-y-auto  ${selector.open ?"scale-100":"scale-0"} transition-all duration-500 ease-in-out origin-top-left z-10 lg:scale-100`}>
+    <aside className={`lg:w-1/5 w-[90%] bg-black p-4  h-screen fixed left-0 mx-0 overflow-y-auto  ${selector.open ?"scale-100":"scale-0"} transition-all duration-500 ease-in-out origin-top-left z-10 lg:scale-100 mt-5`}>
         <div className="mt-16">
       
         <div  className="flex items-center cursor-pointer my-2">

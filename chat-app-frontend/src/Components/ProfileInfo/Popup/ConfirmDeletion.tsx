@@ -21,7 +21,7 @@ export default function ConfirmDeletion(props:{secondPopup:boolean
         }
     }
   return (
-    <div className={`fixed transform -translate-x-1/2 -translate-y-1/2 bg-white shadow-lg rounded-lg p-6 flex items-center justify-center flex-col gap-4 z-50 sm:w-[400px] w-[300px] h-[300px] sm:h-[400px] transition-all duration-500 ease-out
+    <div className={`fixed transform -translate-x-1/2 -translate-y-1/2 bg-[#040404] shadow-lg rounded-lg p-6 flex items-center justify-center flex-col gap-4 z-50 sm:w-[400px] w-[300px] h-[300px] sm:h-[400px] transition-all duration-500 ease-out
         ${props.secondPopup ? 'top-1/2 left-1/2 opacity-100' : 'top-1/2 left-full opacity-0'}
       z-40`}>
         <h2 className="sm:text-2xl text-lg font-bold text-red-600">Confirm Deletion</h2>

@@ -22,6 +22,7 @@ export default function Navbar(props: NavbarProps) {
   const dispatch = useDispatch();
   const [user,setUser]=useState<string>("")
   const selector=useSelector((state:any)=>state.userName)
+
   const [showPopup, setShowPopup] = useState(false);
   const [options,setOptions]=useState(false)
   const [isSetting, setIsSetting] = useState(false)
@@ -60,25 +61,22 @@ export default function Navbar(props: NavbarProps) {
         </div>
   
       </div>
-      <div className="w-full pr-10  flex justify-center items-start sm:gap-20 xsm:gap-10 gap-2">
+      <div className="w-full pr-10  flex justify-center items-start sm:gap-20 xsm:gap-10 gap-3">
         <div>
-        <Link to="/chat" className="mx-3 " onClick={()=>{setIsSetting(false) 
-        dispatch(setPage(" "));}}><ToolTipbtn text={<House className="sm:w-[24px] w-[15px]"/>} bg="bg-[#212121] " info="Home" onClick={()=>{ 
-          console.log("Home clicked");
-          dispatch(setPage(" "));
-          }}/></Link>
+        <Link to="/chat" className="mx-3 bg-[#ffffff] " onClick={()=>{setIsSetting(false) 
+        dispatch(setPage(" "));}}><ToolTipbtn text={<House className="sm:w-[24px] w-[15px]" />} bg="bg-[#212121] " info="Home" link="chat"/></Link>
         </div>
         <div>
-        <a href="/requests/recieved" className=" mx-3 " onClick={()=>setIsSetting(false)}><ToolTipbtn bg="bg-[#212121] " text={<UserCheck className="sm:w-[24px] w-[15px]"/>} info="Recieved requests" onClick={()=>{ dispatch(setPage(" "));}}/></a>
+        <a href="/requests/recieved" className=" mx-3 " onClick={()=>setIsSetting(false)}><ToolTipbtn bg="bg-[#212121] " text={<UserCheck className="sm:w-[24px] w-[15px]"/>} info="Recieved requests" link="requests/recieved"/></a>
         </div>
         <div>
         <a href="/requests/sent" className=" mx-3" onClick={()=>setIsSetting(false)}>
-        <ToolTipbtn bg="bg-[#212121]" text={<ArrowUpRight className="sm:w-[24px] w-[15px] "/>} info="Sent requests"/></a>
+        <ToolTipbtn bg="bg-[#212121]" text={<ArrowUpRight className="sm:w-[24px] w-[15px] "/>} info="Sent requests" link="requests/sent"/></a>
         </div>
         <div>
         <Link to="/settings" className=" mx-3 " onClick={()=>{setIsSetting(true)
           dispatch(setPage(" "));
-        }}><ToolTipbtn bg="bg-[#212121] " text={<Settings className="sm:w-[24px] w-[15px]"/>} info="Settings" /></Link>
+        }}><ToolTipbtn bg="bg-[#212121] " text={<Settings className="sm:w-[24px] w-[15px]"/>} info="Settings"  link="settings"/></Link>
         </div>
       </div>
        <div className="flex justify-end w-full ">

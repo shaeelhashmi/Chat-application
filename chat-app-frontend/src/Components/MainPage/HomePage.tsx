@@ -1,6 +1,12 @@
-
-
+import { useEffect } from "react"
+import { useDispatch } from "react-redux"
+import { setPage } from "../Slice/CurrentPage";
 export default function HomePage() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(setPage(window.location.pathname.slice(1)));
+  }, [dispatch]);
+
   return (
     <>
     <div className="mt-20 flex justify-center items-center flex-col text-white p-3 ">

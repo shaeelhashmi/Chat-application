@@ -2,19 +2,22 @@ import './App.css'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { useEffect } from 'react'
 import AppRoutes from './Routes/AppRoutes'
+import { useDispatch } from "react-redux"
+import { setPage } from "./Components/Slice/CurrentPage";
 function App() {
+  const dispatch = useDispatch();
   useEffect(() => {
     const requestNotificationPermission = async () => {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-    
-        console.log('Notification permission granted.');
-      } else {
-        console.log('Notification permission denied.');
-      }
+  await Notification.requestPermission();
+
+
     };
     requestNotificationPermission();
-    
+    if(!window.location.pathname.startsWith('/chat') &&
+       !window.location.pathname.startsWith('/settings')){
+       dispatch(setPage(window.location.pathname.slice(1)));
+    }
+   
   }, [])
   return (
     <Router>

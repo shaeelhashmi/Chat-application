@@ -47,11 +47,11 @@ export default function Signup() {
  }
 
   return (
-    <div className="flex items-center justify-center h-screen m-0 text-white">
-    <form action="" className="p-3 max-w-[500px] min-w-[200px]  w-[500px] xsm:text-md text-sm" onSubmit={handleSubmit} >
+    <div className="flex items-center justify-center h-screen m-0 text-white font-serif">
+    <form action="" className="p-4 px-5 max-w-[500px] min-w-[200px]  w-[500px] xsm:text-md text-sm bg-[#e8e7e710] rounded-lg" onSubmit={handleSubmit} >
       <h1 className="xsm:text-3xl text-xl font-bold">Get started now</h1>
       <div className="my-3 font-semibold"><label htmlFor="name">Name</label></div>
-      <input type="text" className="border-2 border-solid w-full p-2 rounded-sm text-black" placeholder="Enter your name" value={Name} onChange={(e) => {
+      <input type="text" className=" w-full p-2 rounded-sm bg-[#1e1e1e] text-white focus:outline-none"  placeholder="Enter your name" value={Name} onChange={(e) => {
         if (e.target.value.length > 70) {
             setError("Name must be less than 30 characters")
             return
@@ -59,7 +59,7 @@ export default function Signup() {
         setFullName(e.target.value) 
         }} id="name" />
       <div className="my-3 font-semibold"><label htmlFor="username">Username</label></div>
-      <input type="text" className="border-2 border-solid w-full p-2 rounded-sm text-black" placeholder="Enter your username" value={username} onChange={(e) =>{
+      <input type="text" className=" w-full p-2 rounded-sm bg-[#1e1e1e] text-white focus:outline-none"  placeholder="Enter your username" value={username} onChange={(e) =>{
             const value = e.target.value.replace(/\W/g, '')
             const lowerCaseValue = value.toLowerCase();
             if (value.length > 15) {
@@ -70,12 +70,12 @@ export default function Signup() {
             setUsername(lowerCaseValue)
         }} id='username'/>
       <div className="my-3 font-semibold"><label htmlFor="password">Password</label></div>
-      <input type="password" className="border-2 border-solid w-full p-2 rounded-sm text-black" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} id="password" />
+      <input type="password" className=" w-full p-2 rounded-sm bg-[#1e1e1e] text-white focus:outline-none"  placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} id="password" />
       <div className="my-3 font-semibold"><label htmlFor="confirmpassword">Confirm password</label> </div>
-      <input type="password" className="border-2 border-solid w-full p-2 rounded-sm text-black" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} id="confirmpassword"/>
+      <input type="password" className=" w-full p-2 rounded-sm bg-[#1e1e1e] text-white focus:outline-none"  placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} id="confirmpassword"/>
       <p className="my-3 h-[20px] text-red-500">{error}</p>
      
-    <button type="submit" className="w-full bg-[#3A5B22] my-3 text-white p-2 xsm:text-lg text-md rounded-lg">Sign up</button>
+    <button type="submit" className="w-full bg-[#242424]  my-3 text-white p-2 xsm:text-lg text-md hover:bg-[#3c3c3c] duration-500 transition-all">Sign up</button>
     <p className="text-center my-2">Or</p>
      <p >Already have an account? <Link to="/auth/login" className="text-blue-600">Login</Link></p>
     </form>
