@@ -37,10 +37,10 @@ export default function FriendPopup(props: FriendPopupProps) {
     setSearchResults([])
 }}>
     <div className=" bg-white shadow-lg rounded-md p-6 w-96 h-96">
-        <h1 className="text-3xl text-center my-2 font-bold">Add friends</h1>
-        <div className="flex flex-col">
+        <h1 className="text-3xl text-center my-2 font-bold text-black">Add friends</h1>
+        <div className="flex flex-col"> 
             <div className="flex flex-col">
-            <input type="text" placeholder="Search for friends" className="border p-2 rounded-md my-4" value={searchQuery} onChange={(e)=>{
+            <input type="text" placeholder="Search for friends" className="border p-2 rounded-md my-4 text-black" value={searchQuery} onChange={(e)=>{
                 
                 setSearchQuery(e.target.value)
                 if (e.target.value.length === 0) {
@@ -54,7 +54,7 @@ export default function FriendPopup(props: FriendPopupProps) {
                 
             }}/>
             <div className="h-4">
-            <div className={`${searchResults.length==0?"bg-white rounded-none shadow-none":"bg-slate-200 rounded-b-md shadow-lg"} z-50  relative top-[-13px]  p-4 `}>
+            <div className={`${searchResults.length==0?"bg-white rounded-none shadow-none":"bg-slate-200 rounded-b-md shadow-lg"} z-50  relative top-[-13px]  p-4 text-black`}>
                 {searchResults.map((user: string, index: number) => (
                     <div key={index}>
                         <button className="text-md border-b-2 w-full text-start p-1" onClick={()=>{

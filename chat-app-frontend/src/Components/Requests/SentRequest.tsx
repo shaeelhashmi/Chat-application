@@ -29,7 +29,7 @@ export default function SentRequest() {
     <div className="mt-20">
       {
         sentRequests?.map((request:any) => (
-          <div key={request.id} className="flex justify-between items-center p-2 border-b border-gray-600 my-5 ml-20 text-black">
+          <div key={request.id} className="flex justify-between items-center p-2 border-b border-gray-600 my-5 ml-20 text-white">
             <div className="flex items-center ">
               <span>{request.reciever}</span>
             </div>

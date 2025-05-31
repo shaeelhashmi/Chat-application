@@ -17,6 +17,7 @@ export default function RecievedRequest() {
               ID: requestId
             }, { withCredentials: true })
             setRecievedRequests((prevRequests) => prevRequests.filter((request:any) => request.id !== requestId))
+            location.reload() // Reload the page to reflect changes
         } catch (error) {
             console.error("Error accepting request:", error)
         }
@@ -27,6 +28,7 @@ export default function RecievedRequest() {
               withCredentials: true
             })
             setRecievedRequests((prevRequests) => prevRequests.filter((request:any) => request.id !== requestId))
+            location.reload() // Reload the page to reflect changes
         } catch (error:any) {
             console.error("Error rejecting request:", error)
             console.log(error)
@@ -36,7 +38,7 @@ export default function RecievedRequest() {
     <div className="mt-20">
       {
         recievedRequests?.map((request:any) => (
-          <div key={request.id} className="flex justify-between items-center p-2 border-b border-gray-600 my-5 ml-20 text-black">
+          <div key={request.id} className="flex justify-between items-center p-2 border-b border-gray-600 my-5 ml-20 text-white">
             <div className="flex items-center ">
               <span>{request.sender}</span>
             </div>

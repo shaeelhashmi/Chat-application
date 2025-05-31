@@ -29,8 +29,8 @@ export default function Profile() {
     }, [])
 
   return (
-    <div className="mt-28 text-black    ml-5 sm:text-lg xsm:text-sm text-xs">  
-    <h1 className="sm:text-5xl xsm:text-3xl text-xl text-black text-center">Profile Information  </h1>
+    <div className="mt-28 text-white    ml-5 sm:text-lg xsm:text-sm text-xs">  
+    <h1 className="sm:text-5xl xsm:text-3xl text-xl text-white text-center">Profile Information  </h1>
       <p className="my-3">Full name: {fullName}</p>
         <p className="my-3">Total friends: {friend}</p>
         <p className="my-3">Total people blocked: {blocked}</p>

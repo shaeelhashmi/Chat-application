@@ -39,7 +39,6 @@ export default function AppRoutes() {
    const getSessionID=async () => {
     try {
       const response = await axios.get("http://localhost:8080/user/session", { withCredentials: true });
-      console.log("Session ID:", response);
       setSessionId(response.data.sessionID);
     } catch (error) {
       console.error("Error fetching session ID:", error);
@@ -168,6 +167,7 @@ export default function AppRoutes() {
         fetchFriends();
         fetchUser();
         getSessionID();
+        
 
   
     }, []);
@@ -181,6 +181,7 @@ export default function AppRoutes() {
   
   
     return (
+      
       <Routes>
         <Route path='/auth/login' element={<Login  />} />
         <Route path='/auth/signup' element={<Signup />} />

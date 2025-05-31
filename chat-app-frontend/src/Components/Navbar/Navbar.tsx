@@ -14,6 +14,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { UserCheck } from 'lucide-react';
 import { Settings } from 'lucide-react';
 import ToolTipbtn from "./ToolTip/ToolTipbtn";
+import { setPage } from '../../Components/Slice/CurrentPage';
 interface NavbarProps {
   users: string[];
 }
@@ -26,9 +27,14 @@ export default function Navbar(props: NavbarProps) {
   const [isSetting, setIsSetting] = useState(false)
     const navigate = useNavigate();
     useEffect(() => {
-      console.log(window.location.pathname)
+      if (
+         !( window.location.pathname.startsWith('/chat') &&
+          window.location.pathname.startsWith('/settings') &&
+          window.location.pathname.split('/').length <= 2)
+        ) {
+         dispatch(setPage(" "));
+        }
   if (window.location.pathname.startsWith("/settings")) {
-          console.log(window.location.pathname)
     setIsSetting(true);
   }
 }, []);
@@ -36,7 +42,7 @@ export default function Navbar(props: NavbarProps) {
       setUser(selector.userName)
     },[selector])
   return (
-    <nav className="fixed top-0 w-screen   bg-[#dafdc0] grid  z-20  xsm:grid-cols-[30%,1fr,5%] grid-cols-[40%,1fr,5%] md:grid-cols-[20%,1fr,5%]">
+    <nav className="fixed top-0 w-screen   bg-black grid  z-20  xsm:grid-cols-[30%,1fr,5%] grid-cols-[40%,1fr,5%] md:grid-cols-[20%,1fr,5%] text-white">
       {showPopup && <FriendPopup users={props.users} setState={setShowPopup}/>}
 
       <div className=" lg:pr-10 pr-2 flex flex-row xxs:gap-2 gap-0">
@@ -50,23 +56,29 @@ export default function Navbar(props: NavbarProps) {
           <Menu className="lg:hidden block"/>
         </button>
         <div className="flex items-center justify-center">
-        <h1 className="text-black lg:text-xl font-bold text-[0.8rem] xxs:text-lg">{user}</h1>
+        <h1 className="text-white lg:text-xl font-bold text-[0.8rem] xxs:text-lg">{user}</h1>
         </div>
   
       </div>
       <div className="w-full pr-10  flex justify-center items-start sm:gap-20 xsm:gap-10 gap-2">
         <div>
-        <Link to="/chat" className="mx-3 " onClick={()=>setIsSetting(false)}><ToolTipbtn text={<House className="sm:w-[24px] w-[15px]"/>} bg="bg-[#c3ff92]" info="Home"/></Link>
+        <Link to="/chat" className="mx-3 " onClick={()=>{setIsSetting(false) 
+        dispatch(setPage(" "));}}><ToolTipbtn text={<House className="sm:w-[24px] w-[15px]"/>} bg="bg-[#212121] " info="Home" onClick={()=>{ 
+          console.log("Home clicked");
+          dispatch(setPage(" "));
+          }}/></Link>
         </div>
         <div>
-        <a href="/requests/recieved" className=" mx-3 " onClick={()=>setIsSetting(false)}><ToolTipbtn bg="bg-[#c3ff92]" text={<UserCheck className="sm:w-[24px] w-[15px]"/>} info="Recieved requests"/></a>
+        <a href="/requests/recieved" className=" mx-3 " onClick={()=>setIsSetting(false)}><ToolTipbtn bg="bg-[#212121] " text={<UserCheck className="sm:w-[24px] w-[15px]"/>} info="Recieved requests" onClick={()=>{ dispatch(setPage(" "));}}/></a>
         </div>
         <div>
         <a href="/requests/sent" className=" mx-3" onClick={()=>setIsSetting(false)}>
-        <ToolTipbtn bg="bg-[#c3ff92]" text={<ArrowUpRight className="sm:w-[24px] w-[15px] "/>} info="Sent requests"/></a>
+        <ToolTipbtn bg="bg-[#212121]" text={<ArrowUpRight className="sm:w-[24px] w-[15px] "/>} info="Sent requests"/></a>
         </div>
         <div>
-        <Link to="/settings" className=" mx-3 " onClick={()=>setIsSetting(true)}><ToolTipbtn bg="bg-[#c3ff92]" text={<Settings className="sm:w-[24px] w-[15px]"/>} info="Settings"/></Link>
+        <Link to="/settings" className=" mx-3 " onClick={()=>{setIsSetting(true)
+          dispatch(setPage(" "));
+        }}><ToolTipbtn bg="bg-[#212121] " text={<Settings className="sm:w-[24px] w-[15px]"/>} info="Settings" /></Link>
         </div>
       </div>
        <div className="flex justify-end w-full ">
@@ -78,11 +90,11 @@ export default function Navbar(props: NavbarProps) {
           </div>
     
         <div className={` ${options?"scale-100":"scale-0"} transition-all duration-500 absolute top-10 right-2 origin-top-right `}>
-        <div className="py-4  flex flex-col items-center justify-center relative top-2  sm:w-[200px] w-[100px] bg-[#dafdc0] lg:text-sm">
-          <div className="w-full"><button className="border-b-2 border-white w-full my-2 py-3 hover:bg-[#e6fdd1] duration-500 transition-all" onClick={()=>{
+        <div className="py-4  flex flex-col items-center justify-center relative top-2  sm:w-[200px] w-[100px] bg-[#111111] lg:text-sm">
+          <div className="w-full"><button className="  w-full my-2 py-3 hover:bg-[#262626] duration-500 transition-all" onClick={()=>{
           setShowPopup(!showPopup)
         }}>Add friends</button></div>
-          <div className="w-full">  <button className="border-b-2 border-white w-full my-2 py-3 hover:bg-[#e6fdd1] duration-500 transition-all" onClick={() => {
+          <div className="w-full">  <button className="  w-full my-2 py-3 hover:bg-[#262626] duration-500 transition-all" onClick={() => {
             axios.get("http://localhost:8080/auth/logout", { withCredentials: true })
                 .then(() => navigate("/auth/login"))
                 .catch((err) => console.error("Logout error:", err));

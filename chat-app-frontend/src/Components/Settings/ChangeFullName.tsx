@@ -1,6 +1,5 @@
 import {useState} from 'react'
 import axios from 'axios'
-
 export default function ChangeFullName() {
   const [fullName, setFullName] = useState('')
   const [error, setError] = useState('')
@@ -28,7 +27,7 @@ export default function ChangeFullName() {
     <div className="mt-28">
     <div className="flex justify-center flex-col">
         <div className="flex justify-center items-center mb-4">
-        <h1 className="text-2xl font-bold mb-4 text-center text-black">Change Full name</h1>
+        <h1 className="text-2xl font-bold mb-4 text-center text-white">Change Full name</h1>
         </div>
 
     <div className="flex justify-center items-center mb-4">

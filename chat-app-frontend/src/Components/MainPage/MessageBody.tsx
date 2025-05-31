@@ -3,7 +3,8 @@ import { useState,useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import DeleteMessageBtn from "./DeleteMessageBtn";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setPage } from "../Slice/CurrentPage";
 interface Message {
   sender: string;
   reciever: string;
@@ -18,12 +19,16 @@ interface prop{
   sessionID:string
 }
 export default function MessageBody(props:prop) {
+  const dispatch = useDispatch();
   const [user,setUser]=useState("")
   const selector=useSelector((state:any)=>state.userName)
   const params = useParams<{ id?: string }>();
 const reciever = params.id || "";
 const [Messages, setMessages] = useState("")
 const [length, setLength] = useState(0);
+useEffect(() => {
+  dispatch(setPage(reciever));
+},[reciever]);
 const onDelete = (id: number) => {
    if(!props.socketRef.current) {
        throw "Websocket is not initialized"
@@ -94,12 +99,13 @@ const sendMessage = async() => {
 
   return (
   < >
+
    
-    <div className=" h-full   mt-14 p-2 ml-[3%] w-full">
+    <div className=" h-full   mt-14 p-2 ml-[3%] w-full ">
       {props.MessagesList?.map((message: any, index:number) => (
-        <div key={index} className={`flex mt-4 ${message.sender == user ? "justify-end" : ""}`}>
+        <div key={index} className={`flex mt-4 ${message.sender == user ? "justify-end" : ""} `}>
           <div
-        className={`bg-[#dafdc0] text-black p-4 rounded-lg w-[50%] break-words whitespace-pre-wrap`}
+        className={`bg-[#2C2C2C] text-[#FFF] p-4 rounded-lg w-[50%] break-words whitespace-pre-wrap`}
         style={{ wordBreak: "break-word" }}
           >
         <div className="flex justify-between">
@@ -130,7 +136,7 @@ const sendMessage = async() => {
         />
         </div >
         <div className=" border-none items-center content-center flex justify-center ">
-        <button className={` bg-[#d7ffb6] hover:bg-[#c3ff92] transition-all  p-4 rounded-md duration-500 ${Messages.trim()==""?" hidden":""} relative left-5`} onClick={sendMessage}><SendMsg></SendMsg></button>
+        <button className={` hover:bg-slate-200 transition-all  p-4 rounded-md duration-500 ${Messages.trim()==""?" hidden":""} relative `} onClick={sendMessage}><SendMsg></SendMsg></button>
         </div>
         </div>
       </div>

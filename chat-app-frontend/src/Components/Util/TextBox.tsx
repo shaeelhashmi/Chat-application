@@ -15,7 +15,7 @@ interface TextBoxProps {
 
 export default function TextBox(props: TextBoxProps) {
   return (
-   <div key={props.element.id } className="my-8 text-black grid grid-cols-2 justify-between bg-[#e5ffd2] p-4 rounded-lg shadow-md">
+   <div key={props.element.id } className="my-8 text-white grid grid-cols-2 justify-between bg-[#0a1207] p-4 rounded-lg shadow-md">
           <p className="text-start sm:text-base text-sm">{props.element.text}</p>
            <div className="justify-self-end">
               <button

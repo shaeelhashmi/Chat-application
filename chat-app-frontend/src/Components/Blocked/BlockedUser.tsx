@@ -25,7 +25,7 @@ export default function BlockedUser() {
     {
     block != null && block.length > 0  ?
     <>
-    <div className="w-full text-black mt-16">
+    <div className="w-full text-white mt-16">
         <h1 className="sm:text-4xl text-2xl font-bold text-center">Blocked Users</h1>
         </div>
 {block.map((user: BlockedUser) => (
@@ -49,7 +49,7 @@ export default function BlockedUser() {
   
     </>:
   
-        <h1 className="sm:text-4xl text-2xl font-bold text-center">No Blocked Users</h1>
+        <h1 className="sm:text-4xl text-2xl font-bold text-center text-white">No Blocked Users</h1>
  
 }
     </div>

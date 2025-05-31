@@ -135,11 +135,6 @@ func DeleteAccount(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *se
 		return
 	}
 	tx.Commit()
-	var userID int
-	err = DB.QueryRow("SELECT id FROM users WHERE username=?", username).Scan(&userID)
-	if utils.HandleError(w, err, "Failed to get user ID", http.StatusInternalServerError) {
-		return
-	}
 	w.WriteHeader(http.StatusOK)
 }
 func ChangeFullName(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
