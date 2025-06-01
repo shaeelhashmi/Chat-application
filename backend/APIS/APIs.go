@@ -20,7 +20,6 @@ type Friend struct {
 
 func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions.CookieStore) {
 	User, err := store.Get(r, "Login-session")
-	fmt.Println("Request User:", User.Values["username"])
 	if utils.HandleError(w, err, "Cannot get login session", http.StatusInternalServerError) {
 		return
 	}
@@ -48,40 +47,7 @@ func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions
 	if utils.HandleError(w, err, "Error getting friends", http.StatusInternalServerError) {
 		return
 	}
-	fmt.Println(friendList2)
 	friendList = append(friendList, friendList2...)
-
-	// for rows.Next() {
-	// 	var friend int
-	// 	var friendId int
-	// 	if err := rows.Scan(&friendId, &friend); utils.HandleError(w, err, "Error reading data", http.StatusInternalServerError) {
-	// 		return
-	// 	}
-	// 	var friendName string
-	// 	err = DB.QueryRow("SELECT username FROM users WHERE id = ?", friend).Scan(&friendName)
-	// 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
-	// 		return
-	// 	}
-	// 	friendList = append(friendList, Friend{friendName, friendId})
-	// }
-	// rows, err = DB.Query("SELECT id,Friend2 FROM friends WHERE Friend1 = ?", recieverId)
-	// if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
-	// 	return
-	// }
-	// defer rows.Close()
-	// for rows.Next() {
-	// 	var friend int
-	// 	var friendId int
-	// 	if err := rows.Scan(&friendId, &friend); utils.HandleError(w, err, "Error reading data", http.StatusInternalServerError) {
-	// 		return
-	// 	}
-	// 	var friendName string
-	// 	err = DB.QueryRow("SELECT username FROM users WHERE id = ?", friend).Scan(&friendName)
-	// 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
-	// 		return
-	// 	}
-	// 	friendList = append(friendList, Friend{friendName, friendId})
-	// }
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(friendList)
 
@@ -123,7 +89,6 @@ func ImportUsers(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sess
 		}
 		blockedUsersMap[username] = true
 	}
-	fmt.Print(blockedUsersMap)
 	defer users.Close()
 
 	var usernames []string
@@ -139,7 +104,6 @@ func ImportUsers(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sess
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Print(usernames)
 	json.NewEncoder(w).Encode(usernames)
 }
 
@@ -149,10 +113,12 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 		return
 	}
 	reciever := r.URL.Query().Get("reciever")
+
 	if reciever == "" {
 		http.Error(w, "Reciever is required", http.StatusBadRequest)
 		return
 	}
+
 	var messages []struct {
 		Sender    string    `json:"sender"`
 		Reciever  string    `json:"reciever"`
@@ -168,6 +134,27 @@ func ImportMessages(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *s
 	var senderId int
 	err = DB.QueryRow("SELECT id FROM users WHERE username = ?", User.Values["username"]).Scan(&senderId)
 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+		return
+	}
+	friendList, err := GiveFriends.GiveFriends(DB, recieverId, "Friend2")
+	if utils.HandleError(w, err, "Error getting friends", http.StatusInternalServerError) {
+		return
+	}
+	friendList2, err := GiveFriends.GiveFriends(DB, recieverId, "Friend1")
+	if utils.HandleError(w, err, "Error getting friends", http.StatusInternalServerError) {
+		return
+	}
+	found := false
+	friendList = append(friendList, friendList2...)
+	for _, friend := range friendList {
+		if friend.Friends == User.Values["username"] {
+			found = true
+			break
+		}
+	}
+	fmt.Println(friendList)
+	if !found {
+		http.Error(w, "Reciever is not your friend", http.StatusNotFound)
 		return
 	}
 
@@ -440,7 +427,6 @@ func GetSessionID(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *ses
 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
 		return
 	}
-	fmt.Println("Session ID for user", userName, "is", sessionID)
 	w.Header().Set("Content-Type", "application/json")
 	response := map[string]string{
 		"sessionID": sessionID,

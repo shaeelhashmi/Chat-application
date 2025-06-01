@@ -58,21 +58,14 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 	}
 	defer conn.Close()
 
-	mu.Lock()
-
-	fmt.Println("Active Connections:", Connections) // Debugging line
-	mu.Unlock()
-
 	var sender string
 	for {
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
-			fmt.Println("Error reading message:", err)
 			break
 		}
 		var messageData Message
 		if err := json.Unmarshal(msg, &messageData); err != nil {
-			fmt.Println("Invalid JSON format:", err)
 			continue
 		}
 		if messageData.Type == "logout" {
@@ -84,7 +77,6 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			sessionID := messageData.Sender
 			err = DB.QueryRow("SELECT username FROM sessions WHERE sessionID = ?", sessionID).Scan(&sender)
 			if err != nil {
-				fmt.Println("Error fetching sender username:", err)
 				errMsg := fmt.Sprintf("Failed to fetch sender username: %v", err)
 				conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 				conn.Close()
@@ -115,7 +107,6 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 
 			err = DB.QueryRow("SELECT username FROM sessions WHERE sessionID = ?", sessionID).Scan(&sender)
 			if err != nil {
-				fmt.Println("Error fetching sender username:", err)
 				errMsg := fmt.Sprintf("Failed to fetch sender username: %v", err)
 				conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 				conn.Close()
@@ -151,7 +142,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			var SenderID int
 			err = DB.QueryRow("SELECT id FROM users WHERE username = ?", sender).Scan(&SenderID)
 			if err != nil {
-				fmt.Println("Error fetching sender ID:", err)
+
 				errMsg := fmt.Sprintf("Failed to fetch sender ID: %v", err)
 				conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 				conn.Close()
@@ -160,7 +151,6 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			var ReceiverID int
 			err = DB.QueryRow("SELECT id FROM users WHERE username = ?", receiver).Scan(&ReceiverID)
 			if err != nil {
-				fmt.Println("Error fetching receiver ID:", err)
 				errMsg := fmt.Sprintf("Failed to fetch receiver ID: %v", err)
 				conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 				conn.Close()
@@ -168,7 +158,6 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			}
 			result, err := stmt.Exec(SenderID, ReceiverID, msg1)
 			if err != nil {
-				fmt.Println("Error executing statement:", err)
 				errMsg := fmt.Sprintf("Failed to execute statement: %v", err)
 				conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 				conn.Close()
@@ -176,7 +165,6 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			}
 			lastID, err := result.LastInsertId()
 			if err != nil {
-				fmt.Println("Error getting last insert ID:", err)
 				errMsg := fmt.Sprintf("Failed to get last insert ID: %v", err)
 				conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseInternalServerErr, errMsg))
 				conn.Close()
@@ -193,14 +181,12 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 			}
 			resposeBytes, err := json.Marshal(response)
 			if err != nil {
-				fmt.Println("Error marshalling response:", err)
 				continue
 			}
 			go SendMessage(receiver, resposeBytes)
 			response.ToSender = true
 			resposeBytes, err = json.Marshal(response)
 			if err != nil {
-				fmt.Println("Error marshalling response:", err)
 				continue
 			}
 			go SendMessage(sender, resposeBytes)
@@ -209,9 +195,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request, DB *sql.DB) {
 
 	mu.Lock()
 	delete(Connections, sender)
-	fmt.Println("Logging out", Connections, sender)
 	for key := range Connections {
-		fmt.Println("Key:", key)
 		var userID int
 		err = DB.QueryRow("SELECT id FROM users WHERE username=?", key).Scan(&userID)
 		if err != nil {
@@ -252,11 +236,8 @@ func SendOnlineUsers(userID int, DB *sql.DB, userName string) bool {
 	}
 	resposeBytes, err := json.Marshal(res)
 	if err != nil {
-		fmt.Println("Error marshalling response:", err)
 		return false
 	}
-	fmt.Println("Sending to:", userName)
-	fmt.Println("Sending to:", res)
 	go SendMessage(userName, resposeBytes)
 	return true
 }

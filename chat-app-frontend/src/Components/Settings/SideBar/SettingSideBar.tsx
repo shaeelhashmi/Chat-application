@@ -58,12 +58,7 @@ export default function SettingSideBar() {
             }`} to='/settings/info' onClick={()=>{
               dispatch(setPage(" "))
             }}>Profile info</Link>
-          </div>
-      
-          
-
-        
-        
+          </div>       
       </div>
     
     </aside>

@@ -23,13 +23,12 @@ export default function FriendPopup(props: FriendPopupProps) {
             if (response.status === 200) {
                 setError("Friend added successfully")
             } else {
-                console.log("Error adding friend")
+                setError("Failed to add friend")
             }
         }
         catch (error:any) {
-            console.log(error)
             setError(error.response?.data || error.message || "Error adding friend")
-            console.log("Error adding friend")
+
         }
     }
   return (
@@ -44,7 +43,7 @@ export default function FriendPopup(props: FriendPopupProps) {
                 
                 setSearchQuery(e.target.value)
                 if (e.target.value.length === 0) {
-                    console.log("searchQuery is empty")
+    
                     setSearchResults([])
                     return
                 }

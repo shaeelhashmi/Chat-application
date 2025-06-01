@@ -29,7 +29,7 @@ export default function ChangeUserName() {
 
         } catch (error:any) {
           setError(error.response.data || 'An error occurred while changing the username')
-            console.log(error)
+           
         }
     }
   return (

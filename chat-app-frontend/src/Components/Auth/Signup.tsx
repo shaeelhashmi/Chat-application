@@ -41,7 +41,6 @@ export default function Signup() {
         navigate("/auth/login")
         return 
     } catch (err: any) {
-        console.log(err.response.data)
         setError(err.response.data)
     }
  }

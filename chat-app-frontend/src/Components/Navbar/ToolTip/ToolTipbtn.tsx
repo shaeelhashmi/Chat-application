@@ -10,7 +10,6 @@ export default function ToolTipbtn(props:ToolTipProps) {
   const [page,setPage]=useState<string>("")
   const selector=useSelector((state:any)=>state.currentPage.page)
   useEffect(()=>{
-    console.log("selector",selector)
     setPage(selector)
   },[selector])
     

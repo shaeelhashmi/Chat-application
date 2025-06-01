@@ -27,7 +27,6 @@ func SendFriendRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 		return
 	}
 	user := session.Values["username"].(string)
-	fmt.Println("AddFriend: ", r.Body)
 
 	data, err := io.ReadAll(r.Body)
 	if utils.HandleError(w, err, "Failed to read request body", http.StatusBadRequest) {

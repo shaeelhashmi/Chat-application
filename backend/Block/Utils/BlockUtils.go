@@ -39,6 +39,5 @@ func Blocked(db *sql.DB, userID int, coloumn string) ([]int, []int, []string, er
 		blockedUsers = append(blockedUsers, username)
 		blockedID = append(blockedID, id)
 	}
-	fmt.Println("Blocked users:", blockedUsers, userID)
 	return blockedUsers, blockedID, createdAt, nil
 }

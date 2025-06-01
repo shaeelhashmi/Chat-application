@@ -14,7 +14,6 @@ export default function DeleteMessageBtn(props:prop) {
     setOption(false);
   }
   catch (error) {
-    console.error('Error deleting message:', error);
   }
 }
   return (

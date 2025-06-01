@@ -12,9 +12,9 @@ export default function BlockedUser() {
         try {
         const response = await axios.get("http://localhost:8080/api/friends/blocked", { withCredentials: true });
         setBlocked(response.data);
-        console.log(response.data);
+
         } catch (error) {
-        console.error("Error fetching blocked users:", error);
+
         }
     }
     useEffect(() => {
@@ -33,14 +33,14 @@ export default function BlockedUser() {
   <TextBox handleSubmit={()=>{
     try{
     axios.get(`http://localhost:8080/unblock?blockedid=${user.id}`, { withCredentials: true })
-
+      location.reload()
     }catch (error){
 
     }
   }}
   element={{id:+user.id,text:user.username,created_at:user.created_at}}
   buttonText="Unblock user"
-  buttonColor="bg-green-300 hover:bg-green-400 transition duration-500 ease-in-out"
+  buttonColor="bg-green-700 hover:bg-green-400 transition duration-500 ease-in-out"
   dateRepresentation="Blocked on: "
   />
  

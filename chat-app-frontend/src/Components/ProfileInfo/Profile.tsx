@@ -16,7 +16,6 @@ export default function Profile() {
         const fetchInfo=async()=>{
             try {
                 const response = await axios.get(`http://localhost:8080/user/info`, { withCredentials: true })
-                console.log(response)
                 setFullName(response.data.fullname)
                 setFriend(response.data.totalFriends)
                 setBlocked(response.data.totalBlocked)

@@ -8,11 +8,10 @@ export default function SentRequest() {
         try{ 
             const response = await axios.get("http://localhost:8080/requests/sent", {withCredentials:true});
             setSentRequests(response.data);
-            console.log("Sent Requests:", response.data);
             
         }catch(error:any)
         {
-            console.log("Error fetching sent requests:", error);
+          
         }
         }
         fetchSentRequests()

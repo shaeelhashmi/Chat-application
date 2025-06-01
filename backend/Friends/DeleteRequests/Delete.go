@@ -3,7 +3,6 @@ package delete
 import (
 	utils "chat-app-backend/Utils"
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -67,7 +66,6 @@ func DeleteSentRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 	var id = r.URL.Query().Get("id")
 	check := DB.QueryRow("SELECT  sender FROM requests WHERE id=?", id)
 	if check.Err() != nil {
-		fmt.Println("Error in check:", check.Err())
 		http.Error(w, "Failed to check if request exists", http.StatusInternalServerError)
 		return
 	}

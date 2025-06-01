@@ -8,13 +8,8 @@ export default function HomePage(props:{
   onlineUsers: string[];
 }) {
   const dispatch = useDispatch();
-useEffect(()=>{
- console.log("Online",props.onlineUsers)
- },[props.onlineUsers])
   useEffect(() => {
     dispatch(setPage(window.location.pathname.slice(1)));
-    
-    
   }, []);
   
   return (

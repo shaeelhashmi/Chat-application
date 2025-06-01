@@ -21,6 +21,7 @@ interface prop{
 export default function MessageBody(props:prop) {
   const dispatch = useDispatch();
   const [user,setUser]=useState("")
+  const [show404, setShow404] = useState(false);
   const selector=useSelector((state:any)=>state.userName)
   const params = useParams<{ id?: string }>();
 const reciever = params.id || "";
@@ -49,11 +50,13 @@ const onDelete = (id: number) => {
 const recieveMessages= async ()=>{
   try {
   const response=await axios.get(`http://localhost:8080/api/messages?reciever=${reciever}`,{withCredentials:true})
-  console.log(response.data)
   props.setMessagesList(response.data);
+  console.log(response.data);
+  setShow404(false);
   }
   catch (error) {
-    console.log("Error fetching messages:", error);
+    console.error("Error fetching messages:", error);
+    setShow404(true);
   }
 }
 
@@ -93,56 +96,73 @@ const sendMessage = async() => {
         props.socketRef.current.send(messageData);
         setMessages("");
     } else {
-        console.error("WebSocket is not open");
     }
 };
 
   return (
-  < >
-
-   
-    <div className=" h-full   mt-20 p-2 ml-[3%] w-full ">
-      {props.MessagesList?.map((message: any, index:number) => (
-        <div key={index} className={`flex mt-4 mb-4 ${message.sender == user ? "justify-end" : ""} sm:text-base xsm:text-sm text-xs`}>
+<>
+  {show404 ? (
+    <h1 className="mt-28 text-center text-white text-3xl">404 User Not found</h1>
+  ) : (
+    <div className="h-full mt-20 p-2 ml-[3%] w-full">
+      {props.MessagesList?.map((message: any, index: number) => (
+        <div
+          key={index}
+          className={`flex mt-4 mb-4 ${
+            message.sender == user ? "justify-end" : ""
+          } sm:text-base xsm:text-sm text-xs`}
+        >
           <div
-        className={`bg-[#2C2C2C] text-[#FFF] p-4 rounded-lg w-[50%] break-words whitespace-pre-wrap`}
-        style={{ wordBreak: "break-word" }}
+            className={`bg-[#2C2C2C] text-[#FFF] p-4 rounded-lg w-[50%] break-words whitespace-pre-wrap`}
+            style={{ wordBreak: "break-word" }}
           >
-        <div className="flex justify-between">
-          <p className="break-words whitespace-pre-wrap">{message.message}</p>
-         {message.sender == user &&  <DeleteMessageBtn id={message.id} onDelete={onDelete} />}
-        </div>
-        <div>
-          <p className="text-xs italic font-light text-end font-mono">{new Date(message.created_at).toLocaleString()}</p>
-        </div>
+            <div className="flex justify-between">
+              <p className="break-words whitespace-pre-wrap">
+                {message.message}
+              </p>
+              {message.sender == user && (
+                <DeleteMessageBtn id={message.id} onDelete={onDelete} />
+              )}
+            </div>
+            <div>
+              <p className="text-xs italic font-light text-end font-mono">
+                {new Date(message.created_at).toLocaleString()}
+              </p>
+            </div>
           </div>
         </div>
       ))}
 
       <div className="fixed bottom-0 lg:w-[75%] w-[80%] mx-auto">
         <div className="grid grid-cols-[1fr,5%] bg-white ">
-        <div>
-        <textarea
-          className="border border-gray-300 w-full py-1 px-2 resize-none outline-none bg-gray-200"
-          placeholder="Type a message..."
-          value={Messages}
-          onChange={(e) => setMessages(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              sendMessage();
-            }
-          }}
-        />
-        </div >
-        <div className=" border-none items-center content-center flex justify-center ">
-        <button className={` hover:bg-slate-200 transition-all  p-4 rounded-md duration-500 ${Messages.trim()==""?" hidden":""} relative `} onClick={sendMessage}><SendMsg></SendMsg></button>
-        </div>
+          <div>
+            <textarea
+              className="border border-gray-300 w-full py-1 px-2 resize-none outline-none bg-gray-200"
+              placeholder="Type a message..."
+              value={Messages}
+              onChange={(e) => setMessages(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
+            />
+          </div>
+          <div className=" border-none items-center content-center flex justify-center ">
+            <button
+              className={` hover:bg-slate-200 transition-all  p-4 rounded-md duration-500 ${
+                Messages.trim() == "" ? " hidden" : ""
+              } relative `}
+              onClick={sendMessage}
+            >
+              <SendMsg></SendMsg>
+            </button>
+          </div>
         </div>
       </div>
-  
     </div>
-    
-    </>
+  )}
+</>
   )
 }

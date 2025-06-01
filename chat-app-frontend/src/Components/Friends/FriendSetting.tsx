@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom"
-import { useSelector } from "react-redux"
 import { useEffect, useState } from "react"
 import axios from "axios"
 interface props
@@ -9,10 +8,8 @@ interface props
 }
 export default function FriendSetting(props: props) {
   const { id, name } = useParams()
-  const [user,setUser]=useState<string>("")
   const [found,setFound]=useState<boolean>(true)
   const [fullName,setName]=useState<string>("")
-  const selector=useSelector((state:any)=>state.userName)
   
   const {removeFriend, handleBlock } = props;
   useEffect(() => {
@@ -26,13 +23,6 @@ export default function FriendSetting(props: props) {
     };
     fetchUser();
   },[])
-  useEffect(() => {
-    setUser(selector.userName)
-    console.log(user)
-  },[selector])
-  useEffect(()=>{
-    console.log(user)
-  },[user])
  
 
   return (

@@ -19,7 +19,6 @@ export default function RecievedRequest() {
             setRecievedRequests((prevRequests) => prevRequests.filter((request:any) => request.id !== requestId))
             location.reload() // Reload the page to reflect changes
         } catch (error) {
-            console.error("Error accepting request:", error)
         }
     }
     const handleReject = async (requestId: string) => {
@@ -30,8 +29,6 @@ export default function RecievedRequest() {
             setRecievedRequests((prevRequests) => prevRequests.filter((request:any) => request.id !== requestId))
             location.reload() // Reload the page to reflect changes
         } catch (error:any) {
-            console.error("Error rejecting request:", error)
-            console.log(error)
         }
     }
   return (

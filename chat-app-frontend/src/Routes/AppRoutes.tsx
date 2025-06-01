@@ -52,7 +52,6 @@ export default function AppRoutes() {
             
             
             let parsedData = JSON.parse(event.data)
-             console.log(parsedData)
             if (parsedData.type ==="message")
             {
             if (parsedData.deleteId)
@@ -68,15 +67,12 @@ export default function AppRoutes() {
           }
             setMessagesList(prevMessages => [...(prevMessages || []), parsedData]);
         } else if (parsedData.type === "onlineUsers") {
-          console.log("Setting online users")
           setOnlineUsers(parsedData.OnlineUsers);
         }
         });
         
     
-        socket.addEventListener("close", (event) => {
-          console.log("WebSocket connection closed:", event);
-            console.log("WebSocket disconnected");
+        socket.addEventListener("close", () => {
         });
     
         socket.addEventListener("error", (error) => {
@@ -89,7 +85,6 @@ export default function AppRoutes() {
             sender: sessionID,
             
           });
-          console.log("WebSocket connected");
 
           socket.send(testMessage);
         });
@@ -138,8 +133,8 @@ export default function AppRoutes() {
     };
      const RemoveFriend=async(id:string|undefined,name:string|undefined)=>{
     try {
-      const response = await axios.delete(`http://localhost:8080/friend/remove?friendid=${id}&friendname=${name}`, {withCredentials:true});
-      console.log(response.data);
+      await axios.delete(`http://localhost:8080/friend/remove?friendid=${id}&friendname=${name}`, {withCredentials:true});
+
     }
     catch (error) {
       console.error("Error removing friend:", error);
@@ -151,8 +146,7 @@ export default function AppRoutes() {
         console.error("Invalid id or name for blocking friend");
         return;
       }
-      const response = await axios.get(`http://localhost:8080/block?friendship_id=${id}&friend_name=${name}`, {withCredentials:true});
-      console.log(response.data);
+   await axios.get(`http://localhost:8080/block?friendship_id=${id}&friend_name=${name}`, {withCredentials:true});
     }
     catch (error) {
       console.error("Error blocking friend:", error);
@@ -178,9 +172,7 @@ export default function AppRoutes() {
 
   
     }, []);
-     useEffect(()=>{
-console.log("Online Users in app routes",online)
- },[online])
+
     useEffect(() => {
       if (!sessionID) {
         return;

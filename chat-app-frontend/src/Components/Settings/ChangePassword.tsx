@@ -24,7 +24,6 @@ export default function ChangePassword() {
       location.reload()
     } catch (error) {
       setError("Internal server error")
-      console.log(error)
     }
   }
 

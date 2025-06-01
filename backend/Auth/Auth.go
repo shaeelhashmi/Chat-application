@@ -89,7 +89,6 @@ func Login(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, 
 	if utils.HandleError(w, err, "Failed to save session", http.StatusInternalServerError) {
 		return
 	}
-	fmt.Println("Session ID:", sessionID)
 	_, err = tx.Exec("INSERT INTO sessions (username, sessionID) VALUES (?, ?) ON DUPLICATE KEY UPDATE sessionID = VALUES(sessionID)", user.Username, sessionID)
 	if utils.HandleError(w, err, "Failed to insert session", http.StatusInternalServerError) {
 		return
@@ -237,7 +236,6 @@ func CheckSessions(db *sql.DB) {
 
 		rows, err := db.Query("SELECT username FROM sessions WHERE EndDate < NOW()")
 		if err != nil {
-			fmt.Println("Error fetching expired sessions:", err)
 			continue
 		}
 		var found bool
@@ -245,14 +243,13 @@ func CheckSessions(db *sql.DB) {
 			var username string
 
 			if err := rows.Scan(&username); err != nil {
-				fmt.Println("Error scanning row:", err)
+
 				continue
 			}
 			delete(Socket.Connections, username) // Remove from active connections
 			var userID int
 			err = db.QueryRow("SELECT id FROM users WHERE username=?", username).Scan(&userID)
 			if err != nil {
-				fmt.Println("Error fetching user ID:", err)
 				continue
 			}
 			Socket.SendOnlineUsers(userID, db, username)
@@ -262,10 +259,8 @@ func CheckSessions(db *sql.DB) {
 		rows.Close()
 
 		if found {
-			_, err := db.Exec("DELETE FROM sessions WHERE EndDate < NOW()")
-			if err != nil {
-				fmt.Println("Error deleting expired sessions:", err)
-			}
+			db.Exec("DELETE FROM sessions WHERE EndDate < NOW()")
+
 		}
 	}
 }
