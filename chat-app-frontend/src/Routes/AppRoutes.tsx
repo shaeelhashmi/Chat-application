@@ -31,6 +31,7 @@ interface Message {
 export default function AppRoutes() {
     const [users, setUsers] = useState<string[]>([]);
     const [friends,setFriends] = useState<any[]>([]);
+    const [online, setOnlineUsers] = useState<string[]>([]);
    const socketRef = useRef<WebSocket | null>(null);
 
    /*For sockets*/
@@ -52,6 +53,8 @@ export default function AppRoutes() {
             
             let parsedData = JSON.parse(event.data)
              console.log(parsedData)
+            if (parsedData.type ==="message")
+            {
             if (parsedData.deleteId)
             {           
                 setMessagesList(prevMessages => prevMessages?.filter(message => message.id !== parsedData.deleteId) || []);
@@ -64,7 +67,12 @@ export default function AppRoutes() {
             });
           }
             setMessagesList(prevMessages => [...(prevMessages || []), parsedData]);
+        } else if (parsedData.type === "onlineUsers") {
+          console.log("Setting online users")
+          setOnlineUsers(parsedData.OnlineUsers);
+        }
         });
+        
     
         socket.addEventListener("close", (event) => {
           console.log("WebSocket connection closed:", event);
@@ -77,13 +85,12 @@ export default function AppRoutes() {
      
         socket.addEventListener("open", () => {
           const testMessage = JSON.stringify({
+            type: "test",
             sender: sessionID,
-            reciever: "",
-            message: "Test message from socket",
-             deleteID: -1,
             
           });
-          console.log("Sending test message:", testMessage);
+          console.log("WebSocket connected");
+
           socket.send(testMessage);
         });
         return () => {
@@ -171,6 +178,9 @@ export default function AppRoutes() {
 
   
     }, []);
+     useEffect(()=>{
+console.log("Online Users in app routes",online)
+ },[online])
     useEffect(() => {
       if (!sessionID) {
         return;
@@ -188,7 +198,7 @@ export default function AppRoutes() {
         
         <Route path='/requests/sent' element={
         <>
-        <Navbar users={users}/>
+        <Navbar users={users} socket={socketRef}/>
         <PageDistribution  text={
           <> 
         <ChatSidebar removeFriend={RemoveFriend} handleBlock={handleBlock} users={friends}/>
@@ -200,7 +210,7 @@ export default function AppRoutes() {
       />
       <Route path='/settings' element={
         <>
-              <Navbar users={users}/>   
+              <Navbar users={users} socket={socketRef}/>   
                 <PageDistribution  text={
           <> 
               <SettingSideBar />
@@ -212,7 +222,7 @@ export default function AppRoutes() {
         } />
            <Route path='/settings/user' element={
         <>
-              <Navbar users={users}/>   
+              <Navbar users={users} socket={socketRef}/>   
               <PageDistribution text={
              <>
               <SettingSideBar />
@@ -225,7 +235,7 @@ export default function AppRoutes() {
         } />
             <Route path='/settings/password' element={
         <>
-              <Navbar users={users}/>   
+              <Navbar users={users} socket={socketRef}/>   
               <PageDistribution text={
               <>
               <SettingSideBar />
@@ -237,7 +247,7 @@ export default function AppRoutes() {
         } />
       <Route path='/chat/:id' element={
         <>
-        <Navbar users={users}/>     
+        <Navbar users={users} socket={socketRef}/>     
         <PageDistribution text={
           <>
           <ChatSidebar removeFriend={RemoveFriend} handleBlock={handleBlock} users={friends}/>
@@ -247,15 +257,15 @@ export default function AppRoutes() {
          </>} />
          <Route path='/chat' element={
         <>
-        <Navbar users={users}/>   
+        <Navbar users={users} socket={socketRef}/>   
         <PageDistribution text={<>
             <ChatSidebar removeFriend={RemoveFriend} handleBlock={handleBlock} users={friends}/>
-        <HomePage  ></HomePage>
+        <HomePage  socket={socketRef} sessionID={sessionID} onlineUsers={online}></HomePage>
         </>}/>  
          </>} />
          <Route path='/requests/recieved' element={
         <>
-          <Navbar users={users}/>    
+          <Navbar users={users} socket={socketRef}/>    
         <PageDistribution text={<>
             <ChatSidebar removeFriend={RemoveFriend} handleBlock={handleBlock} users={friends}/>
         <RecievedRequest  ></RecievedRequest>
@@ -265,7 +275,7 @@ export default function AppRoutes() {
          </>} />
          <Route path="/friend/:id/:name" element={
         <>
-        <Navbar users={users}/>
+        <Navbar users={users} socket={socketRef}/>
         <PageDistribution text={<>
           <ChatSidebar removeFriend={RemoveFriend} handleBlock={handleBlock} users={friends}/>
         <FriendSetting handleBlock={handleBlock} removeFriend={RemoveFriend} />
@@ -273,14 +283,14 @@ export default function AppRoutes() {
         </>} />
           <Route path='/settings/activity' element={
         <>
-              <Navbar users={users}/>   
+              <Navbar users={users} socket={socketRef}/>   
               <PageDistribution text={<><SettingSideBar />
               <Activitylog /></>}/>
         </>
         } />
         <Route path='/settings/blocked' element={
         <>
-              <Navbar users={users}/>   
+              <Navbar users={users} socket={socketRef}/>   
               <PageDistribution text={<>
                       <SettingSideBar />
               <BlockedUser ></BlockedUser>
@@ -289,7 +299,7 @@ export default function AppRoutes() {
         } />
         <Route path='/settings/info' element={
           <>
-          <Navbar users={users}/>   
+          <Navbar users={users} socket={socketRef}/>   
               <PageDistribution text={<>
                       <SettingSideBar />
               <Profile ></Profile>
@@ -298,7 +308,7 @@ export default function AppRoutes() {
         }/>
          <Route path='/settings/fullname' element={
           <>
-          <Navbar users={users}/>   
+          <Navbar users={users} socket={socketRef}/>   
               <PageDistribution text={<>
                       <SettingSideBar />
               <ChangeFullName ></ChangeFullName>

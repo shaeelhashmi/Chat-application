@@ -3,14 +3,12 @@ package Exists
 import (
 	utils "chat-app-backend/Utils"
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/sessions"
 )
 
 func Exists(w http.ResponseWriter, r *http.Request, db *sql.DB, store *sessions.CookieStore) {
-	fmt.Println("Checking if friendship exists")
 	session, err := store.Get(r, "Login-session")
 	if utils.HandleError(w, err, "Error getting session", http.StatusInternalServerError) {
 		return

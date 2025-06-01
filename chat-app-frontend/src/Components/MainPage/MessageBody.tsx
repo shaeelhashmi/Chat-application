@@ -84,6 +84,7 @@ const sendMessage = async() => {
     }
     if (props.socketRef.current && props.socketRef.current.readyState === WebSocket.OPEN) {
         const messageData = JSON.stringify({
+            type: "message",
             sender: props.sessionID,
             reciever: reciever,
             message: Messages,

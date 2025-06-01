@@ -2,6 +2,7 @@ package apis
 
 import (
 	blockutils "chat-app-backend/Block/Utils"
+	GiveFriends "chat-app-backend/Friends/Utils"
 	utils "chat-app-backend/Utils"
 	"database/sql"
 	"encoding/json"
@@ -12,7 +13,7 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-type friends struct {
+type Friend struct {
 	Friends string `json:"friend"`
 	Id      int    `json:"id"`
 }
@@ -39,38 +40,48 @@ func Friends(w http.ResponseWriter, r *http.Request, DB *sql.DB, store *sessions
 	}
 	defer rows.Close()
 
-	var friendList []friends
-	for rows.Next() {
-		var friend int
-		var friendId int
-		if err := rows.Scan(&friendId, &friend); utils.HandleError(w, err, "Error reading data", http.StatusInternalServerError) {
-			return
-		}
-		var friendName string
-		err = DB.QueryRow("SELECT username FROM users WHERE id = ?", friend).Scan(&friendName)
-		if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
-			return
-		}
-		friendList = append(friendList, friends{friendName, friendId})
-	}
-	rows, err = DB.Query("SELECT id,Friend2 FROM friends WHERE Friend1 = ?", recieverId)
-	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+	friendList, err := GiveFriends.GiveFriends(DB, recieverId, "Friend2")
+	if utils.HandleError(w, err, "Error getting friends", http.StatusInternalServerError) {
 		return
 	}
-	defer rows.Close()
-	for rows.Next() {
-		var friend int
-		var friendId int
-		if err := rows.Scan(&friendId, &friend); utils.HandleError(w, err, "Error reading data", http.StatusInternalServerError) {
-			return
-		}
-		var friendName string
-		err = DB.QueryRow("SELECT username FROM users WHERE id = ?", friend).Scan(&friendName)
-		if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
-			return
-		}
-		friendList = append(friendList, friends{friendName, friendId})
+	friendList2, err := GiveFriends.GiveFriends(DB, recieverId, "Friend1")
+	if utils.HandleError(w, err, "Error getting friends", http.StatusInternalServerError) {
+		return
 	}
+	fmt.Println(friendList2)
+	friendList = append(friendList, friendList2...)
+
+	// for rows.Next() {
+	// 	var friend int
+	// 	var friendId int
+	// 	if err := rows.Scan(&friendId, &friend); utils.HandleError(w, err, "Error reading data", http.StatusInternalServerError) {
+	// 		return
+	// 	}
+	// 	var friendName string
+	// 	err = DB.QueryRow("SELECT username FROM users WHERE id = ?", friend).Scan(&friendName)
+	// 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+	// 		return
+	// 	}
+	// 	friendList = append(friendList, Friend{friendName, friendId})
+	// }
+	// rows, err = DB.Query("SELECT id,Friend2 FROM friends WHERE Friend1 = ?", recieverId)
+	// if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+	// 	return
+	// }
+	// defer rows.Close()
+	// for rows.Next() {
+	// 	var friend int
+	// 	var friendId int
+	// 	if err := rows.Scan(&friendId, &friend); utils.HandleError(w, err, "Error reading data", http.StatusInternalServerError) {
+	// 		return
+	// 	}
+	// 	var friendName string
+	// 	err = DB.QueryRow("SELECT username FROM users WHERE id = ?", friend).Scan(&friendName)
+	// 	if utils.HandleError(w, err, "Error quering database", http.StatusInternalServerError) {
+	// 		return
+	// 	}
+	// 	friendList = append(friendList, Friend{friendName, friendId})
+	// }
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(friendList)
 

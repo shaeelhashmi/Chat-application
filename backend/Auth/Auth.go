@@ -1,6 +1,8 @@
 package Auth
 
 import (
+	"chat-app-backend/Socket"
+	utils "chat-app-backend/Utils"
 	"crypto/rand"
 	"crypto/sha512"
 	"database/sql"
@@ -10,8 +12,6 @@ import (
 	"io"
 	"net/http"
 	"time"
-
-	utils "chat-app-backend/Utils"
 
 	"github.com/gorilla/sessions"
 )
@@ -234,9 +234,38 @@ func Logout(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore)
 func CheckSessions(db *sql.DB) {
 	for {
 		time.Sleep(15 * time.Minute)
-		_, err := db.Exec("DELETE FROM sessions WHERE EndDate < NOW()")
+
+		rows, err := db.Query("SELECT username FROM sessions WHERE EndDate < NOW()")
 		if err != nil {
-			fmt.Println("Error deleting expired sessions:", err)
+			fmt.Println("Error fetching expired sessions:", err)
+			continue
+		}
+		var found bool
+		for rows.Next() {
+			var username string
+
+			if err := rows.Scan(&username); err != nil {
+				fmt.Println("Error scanning row:", err)
+				continue
+			}
+			delete(Socket.Connections, username) // Remove from active connections
+			var userID int
+			err = db.QueryRow("SELECT id FROM users WHERE username=?", username).Scan(&userID)
+			if err != nil {
+				fmt.Println("Error fetching user ID:", err)
+				continue
+			}
+			Socket.SendOnlineUsers(userID, db, username)
+			found = true
+
+		}
+		rows.Close()
+
+		if found {
+			_, err := db.Exec("DELETE FROM sessions WHERE EndDate < NOW()")
+			if err != nil {
+				fmt.Println("Error deleting expired sessions:", err)
+			}
 		}
 	}
 }

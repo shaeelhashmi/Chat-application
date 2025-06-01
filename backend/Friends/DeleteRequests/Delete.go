@@ -76,7 +76,6 @@ func DeleteSentRequest(w http.ResponseWriter, r *http.Request, DB *sql.DB, store
 	if utils.HandleError(w, err, "Failed to scan request", http.StatusInternalServerError) {
 		return
 	}
-	fmt.Println("Sender ID:", sender)
 	var senderName string
 	err = DB.QueryRow("SELECT username FROM users WHERE id=?", sender).Scan(&senderName)
 	if utils.HandleError(w, err, "Failed to get user ID", http.StatusInternalServerError) {

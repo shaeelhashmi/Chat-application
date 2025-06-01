@@ -17,6 +17,7 @@ import ToolTipbtn from "./ToolTip/ToolTipbtn";
 import { setPage } from '../../Components/Slice/CurrentPage';
 interface NavbarProps {
   users: string[];
+  socket: any;
 }
 export default function Navbar(props: NavbarProps) {
   const dispatch = useDispatch();
@@ -92,10 +93,20 @@ export default function Navbar(props: NavbarProps) {
           <div className="w-full"><button className="  w-full my-2 py-3 hover:bg-[#262626] duration-500 transition-all" onClick={()=>{
           setShowPopup(!showPopup)
         }}>Add friends</button></div>
-          <div className="w-full">  <button className="  w-full my-2 py-3 hover:bg-[#262626] duration-500 transition-all" onClick={() => {
+          <div className="w-full">  <button className="  w-full my-2 py-3 hover:bg-[#262626] duration-500 transition-all" onClick={
+            () => {
+              try{
+                const messageData =JSON.stringify({
+                  type:"logout",
+                  Sender:user
+                })
+                 props.socket?.current.send(messageData)
             axios.get("http://localhost:8080/auth/logout", { withCredentials: true })
                 .then(() => navigate("/auth/login"))
                 .catch((err) => console.error("Logout error:", err));
+              }catch (error) {
+
+              }
         }}>Logout</button></div>
           
         
