@@ -52,13 +52,15 @@ export default function AppRoutes() {
             
             
             let parsedData = JSON.parse(event.data)
-            if (parsedData.type ==="message")
-            {
+  
             if (parsedData.deleteId)
             {           
                 setMessagesList(prevMessages => prevMessages?.filter(message => message.id !== parsedData.deleteId) || []);
                 return;
             }
+            if (parsedData.type ==="message")
+            {
+            
             if (!parsedData.toSender)
             {
             new Notification('Message recieved', {

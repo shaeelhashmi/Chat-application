@@ -36,10 +36,11 @@ const onDelete = (id: number) => {
     }
     if (props.socketRef.current && props.socketRef.current.readyState === WebSocket.OPEN) {
         const messageData = JSON.stringify({
+            type: "message",
             sender: props.sessionID,
             reciever: reciever,
             message: "",
-            deleteID: id,
+            DeleteID: id,
             });
         props.socketRef.current.send(messageData);
         setMessages("");
@@ -51,7 +52,6 @@ const recieveMessages= async ()=>{
   try {
   const response=await axios.get(`http://localhost:8080/api/messages?reciever=${reciever}`,{withCredentials:true})
   props.setMessagesList(response.data);
-  console.log(response.data);
   setShow404(false);
   }
   catch (error) {
@@ -71,7 +71,6 @@ useEffect(() => {
 useEffect(() => {
   if (length !== props.MessagesList?.length && length!=0) {
     const isAtBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 100;
-    console.log( window.innerHeight + window.scrollY, document.body.scrollHeight);
     if (isAtBottom) {
       window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
     }
