@@ -123,7 +123,7 @@ export default function AppRoutes() {
     const fetchUser = async () => {
       try {
         await axios.get("http://localhost:8080/isloggedin", { withCredentials: true });
-        if (window.location.href === 'http://localhost:5173/auth/login' || window.location.href === 'http://localhost:5173/auth/signup') {
+        if (window.location.href === 'http://localhost:5173/auth/login' || window.location.href === 'http://localhost:5173/auth/signup' || window.location.href === 'http://localhost:5173/') {
           navigate("/chat");
         }
       } catch (error) {
@@ -309,6 +309,11 @@ export default function AppRoutes() {
                 </>}/>
           </>
         }/>
+        <Route path="*" element={
+          <div className='flex justify-center items-center h-screen'>
+          <h1 className='text-5xl text-white'>404 - Not Found</h1>
+          </div>
+        } />
 
       </Routes>
     );
