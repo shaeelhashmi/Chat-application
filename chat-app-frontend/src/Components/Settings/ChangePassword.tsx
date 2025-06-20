@@ -36,10 +36,10 @@ export default function ChangePassword() {
         </div>
 
     <div className="flex justify-center items-center mb-4">
-    <input type="text" placeholder="Password" className="border border-gray-300 rounded px-4 py-2 mb-4" value={password} onChange={(e)=>setPassword(e.target.value)}/>
+    <input type="password" placeholder="Password" className="border border-gray-300 rounded px-4 py-2 mb-4" value={password} onChange={(e)=>setPassword(e.target.value)}/>
     </div>
     <div className="flex justify-center items-center mb-4">
-    <input type="text" placeholder="Confirm password" className="border border-gray-300 rounded px-4 py-2 mb-4" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}/>
+    <input type="password" placeholder="Confirm password" className="border border-gray-300 rounded px-4 py-2 mb-4" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}/>
     </div>
     <div className="flex justify-center items-center mb-4">
     <div className='w-full text-red-600 h-4 text-center'>{error}</div>
