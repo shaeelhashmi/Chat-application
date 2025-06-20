@@ -127,6 +127,8 @@ The env file has this format:
 </br>
 ` DBUSER="Your database username" `
 </br>
+` Address="Backend server link" `
+</br>
 ` DBPASS="Database password" `
 </br>
 ` SESSION_KEY="A random key for creating a secure session" `
