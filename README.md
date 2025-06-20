@@ -106,13 +106,17 @@ CREATE TABLE `blocked_users` (
   CONSTRAINT `blocked_users_ibfk_2` FOREIGN KEY (`blocked`) REFERENCES `users` (`id`)
 )
 ```
-Once in the news-recommendation-algorithm [set up your .env file](#setting-up-env) and then run: 
+Once in the Chat-application folder run: 
+```
+  cd backend
+```
+In this directory [set up your .env file](#setting-up-env) and then run
 ```
 go run main.go
 ```
-Then start the frontend server by typing the following commands:
+Then start the frontend server by typing the following commands in the terminal at the root directory:
 ```
-cd my-project
+cd chat-app-frontend
 ```
 Once in the directory install the necessary packages.
 ```
